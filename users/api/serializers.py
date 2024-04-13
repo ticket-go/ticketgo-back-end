@@ -25,7 +25,16 @@ class CustomUserUpdateSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name', 'phone', 'gender', 'address']
 
 
+class CustomUserChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_new_password = serializers.CharField(required=True)
 
+    def validate(self, data):
+        
+        if data['new_password'] != data['confirm_new_password']:
+            raise serializers.ValidationError("Senhas diferentes. Tente novamente.")
+        return data
 
 
 #Autenticação
