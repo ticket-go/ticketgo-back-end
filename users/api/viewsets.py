@@ -12,6 +12,8 @@ from rest_framework import status
 from rest_framework import generics
 from users.api import serializers
 
+from django.contrib.auth import logout
+
 from users.models import CustomUser
 
 from allauth.account.models import EmailAddress
@@ -82,7 +84,7 @@ class CustomUserChangeEmailViewSet(generics.GenericAPIView):
                         status=status.HTTP_200_OK)
 
 class CustomUserUpdateViewSet(generics.UpdateAPIView):
-    
+
     serializer_class = serializers.CustomUserUpdateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -117,3 +119,11 @@ class LoginViewSet(APIView):
             else:
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutViewSet(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        logout(request)
+        return Response({"message": "Você foi desconectado com sucesso."}, status=status.HTTP_200_OK)

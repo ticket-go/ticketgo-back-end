@@ -65,6 +65,7 @@ MIDDLEWARE = [
 
     #django-allauth
     'allauth.account.middleware.AccountMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'core.urls'
