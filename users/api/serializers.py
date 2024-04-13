@@ -36,8 +36,8 @@ class CustomUserChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError("Senhas diferentes. Tente novamente.")
         return data
 
-
-#Autenticação
+class CustomUserChangeEmailSerializer(serializers.Serializer):
+    new_email = serializers.EmailField(required=True)
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=16)

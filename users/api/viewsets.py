@@ -12,6 +12,12 @@ from rest_framework import status
 from rest_framework import generics
 from users.api import serializers
 
+from users.models import CustomUser
+
+from allauth.account.models import EmailAddress
+from allauth.account.utils import send_email_confirmation
+
+
 class CustomUserViewSet(generics.CreateAPIView):
 
     serializer_class = serializers.CustomUserSerializer
@@ -31,6 +37,7 @@ class CustomUserViewSet(generics.CreateAPIView):
 
 
 class CustomUserChangePasswordViewSet(generics.UpdateAPIView):
+
     serializer_class = serializers.CustomUserChangePasswordSerializer
     permission_classes = [IsAuthenticated]
 
@@ -52,7 +59,30 @@ class CustomUserChangePasswordViewSet(generics.UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class CustomUserChangeEmailViewSet(generics.GenericAPIView):
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.CustomUserChangeEmailSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        new_email = serializer.validated_data.get('new_email')
+        
+        if CustomUser.objects.filter(email=new_email).exists():
+            return Response({"error": "Este endereço de e-mail já está em uso por outro usuário."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        
+        user = request.user
+        user.email = new_email
+        user.save()
+
+        return Response({"message": "Seu endereço de e-mail foi alterado com sucesso."},
+                        status=status.HTTP_200_OK)
+
 class CustomUserUpdateViewSet(generics.UpdateAPIView):
+    
     serializer_class = serializers.CustomUserUpdateSerializer
     permission_classes = [IsAuthenticated]
 
