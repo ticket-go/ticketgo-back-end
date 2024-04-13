@@ -2,6 +2,9 @@ from rest_framework import serializers
 from users import models
 
 
+
+#Dados do usuário
+
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CustomUser
@@ -15,6 +18,17 @@ class CustomUserSerializer(serializers.ModelSerializer):
            
         )
         return user
+
+class CustomUserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CustomUser
+        fields = ['first_name', 'last_name', 'phone', 'gender', 'address']
+
+
+
+
+
+#Autenticação
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=16)
