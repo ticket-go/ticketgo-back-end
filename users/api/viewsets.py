@@ -1,23 +1,16 @@
-from rest_framework import generics
-from rest_framework.response import Response
-from rest_framework import status
-from users.api import serializers
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import Token, RefreshToken, TokenError
-from django.contrib.auth import authenticate
-from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import authenticate, logout
 from django.contrib.auth.hashers import check_password
+from django.shortcuts import redirect
+
+from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+
 from users.api import serializers
-
-from django.contrib.auth import logout
-
 from users.models import CustomUser
-
-from allauth.account.models import EmailAddress
-from allauth.account.utils import send_email_confirmation
 
 
 class CustomUserViewSet(generics.CreateAPIView):
@@ -127,3 +120,20 @@ class LogoutViewSet(APIView):
     def post(self, request):
         logout(request)
         return Response({"message": "Você foi desconectado com sucesso."}, status=status.HTTP_200_OK)
+
+
+
+class SocialLoginViewSet(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, *args, **kwargs):
+        provider = kwargs.get('provider')
+
+        if provider == 'google':
+            # Redirecionar para a página de login social do provedor do Google
+            return redirect('/accounts/google/login/')
+        else:
+            return Response({'error': 'Provider not supported'}, status=400)
+
+   
