@@ -131,7 +131,7 @@ class SocialLoginViewSet(APIView):
         provider = kwargs.get('provider')
 
         if provider == 'google':
-            # Redirecionar para a página de login social do provedor do Google
+            
             return redirect('/accounts/google/login/')
         else:
             return Response({'error': 'Provider not supported'}, status=400)
