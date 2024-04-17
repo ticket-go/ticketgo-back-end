@@ -15,6 +15,8 @@ urlpatterns = [
 
     #users
     path('api/', include('users.urls')),
+    path('', include('events.urls')),
+    path('', include('address.urls')),
 
 
     #djangorestframework-simplejwt
