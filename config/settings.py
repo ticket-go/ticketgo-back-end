@@ -25,6 +25,7 @@ LOCAL_APPS = [
     "apps.address",
     "apps.events",
     "apps.tickets",
+    "apps.organization",
 ]
 
 THIRD_PARTY_APPS = [
@@ -72,26 +73,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "ticket-go",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "127.0.0.1",
-        "DATABASE_PORT": "5432",
-        "OPTIONS": {
-            "client_encoding": "utf8",
-        },
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#         "NAME": "ticket-go",
+#         "USER": "postgres",
+#         "PASSWORD": "postgres",
+#         "HOST": "127.0.0.1",
+#         "DATABASE_PORT": "5432",
+#         "OPTIONS": {
+#             "client_encoding": "utf8",
+#         },
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
