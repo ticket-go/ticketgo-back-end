@@ -12,26 +12,31 @@ DEBUG = True
 ALLOWED_HOSTS = ["127.0.0.1"]
 
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+]
+
+LOCAL_APPS = [
     "apps.users",
     "apps.events",
     "apps.address",
-    # apps necessários para as bibliotecas
-    # django-allauth
+]
+
+THIRD_PARTY_APPS = [
     "django.contrib.sites",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    # django-rest-framework
     "rest_framework",
 ]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -73,6 +78,20 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#         "NAME": "ticket-go",
+#         "USER": "postgres",
+#         "PASSWORD": "password",
+#         "HOST": "127.0.0.1",
+#         "DATABASE_PORT": "5432",
+#         "OPTIONS": {
+#             "client_encoding": "utf8",
+#         },
+#     }
+# }
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -97,14 +116,21 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = "static/"
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Static
+
+STATIC_URL = "apps/static/"
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "apps/static"),
+]
+
+
+# Media
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Configurações
 
