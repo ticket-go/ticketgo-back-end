@@ -20,6 +20,7 @@ class EventsSerializer(serializers.ModelSerializer):
             "tickets_sold",
             "tickets_available",
             "address",
+            "organization"
         ]
 
     tickets_sold = serializers.IntegerField(read_only=True)
