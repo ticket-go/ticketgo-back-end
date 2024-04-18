@@ -3,14 +3,12 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 SECRET_KEY = "django-insecure-^v87bu1ey^@uvb5+6toug0-dcnc_!$t1$yl$8c4d48lpvp!i$$"
 
 
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1"]
-
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -22,9 +20,11 @@ DJANGO_APPS = [
 ]
 
 LOCAL_APPS = [
+    "apps.core",
     "apps.users",
-    "apps.events",
     "apps.address",
+    "apps.events",
+    "apps.tickets",
 ]
 
 THIRD_PARTY_APPS = [
@@ -71,26 +71,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
 # DATABASES = {
 #     "default": {
-#         "ENGINE": "django.db.backends.postgresql_psycopg2",
-#         "NAME": "ticket-go",
-#         "USER": "postgres",
-#         "PASSWORD": "password",
-#         "HOST": "127.0.0.1",
-#         "DATABASE_PORT": "5432",
-#         "OPTIONS": {
-#             "client_encoding": "utf8",
-#         },
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "ticket-go",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
+        "HOST": "127.0.0.1",
+        "DATABASE_PORT": "5432",
+        "OPTIONS": {
+            "client_encoding": "utf8",
+        },
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
