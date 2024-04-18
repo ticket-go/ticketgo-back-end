@@ -7,19 +7,13 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
-    #django-allauth
-    path('accounts/', include('allauth.urls')),
-
-
-    #users
-    path('api/', include('apps.users.urls')),
-    path('', include('apps.events.urls')),
-    path('', include('apps.address.urls')),
-
-
-    #djangorestframework-simplejwt
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path("admin/", admin.site.urls),
+    # django-allauth
+    path("accounts/", include("allauth.urls")),
+    #
+    path("api/", include("config.api_router")),
+    path("users/", include("apps.users.urls")),
+    # djangorestframework-simplejwt
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
