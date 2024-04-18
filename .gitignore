@@ -1,4 +1,5 @@
-# Django #
+venv/
+db.sqlite3# Django #
 *.log
 *.pot
 *.pyc
