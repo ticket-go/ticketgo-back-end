@@ -21,7 +21,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class CustomUserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CustomUser
-        fields = ['first_name', 'last_name', 'phone', 'gender', 'address']
+        fields = ['first_name', 'last_name', 'phone', 'gender', 'address', 'organization']
 
 
 class CustomUserChangePasswordSerializer(serializers.Serializer):
