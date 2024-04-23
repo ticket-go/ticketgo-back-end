@@ -26,14 +26,14 @@ class CustomUser(AbstractUser):
         blank=True,
         verbose_name=_("Endereço"),
     )
-    # organization = models.ForeignKey(
-    #     "organizations.Organization",
-    #     verbose_name=_("Organização"),
-    #     related_name="event_organization",
-    #     on_delete=models.CASCADE,
-    #     null=True,
-    #     blank=True,
-    # )
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        verbose_name=_("Organização"),
+        related_name="user_organization",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     def get_user_id(self):
         return self.user_id
