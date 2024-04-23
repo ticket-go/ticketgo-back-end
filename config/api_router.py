@@ -6,8 +6,10 @@ from apps.tickets.api.views import TicketsViewSet
 from apps.organizations.api.views import OrganizationViewSet
 
 router = routers.SimpleRouter()
+
 router.register("events", EventsViewSet)
 router.register("addresses", AddressViewSet)
 router.register("tickets", TicketsViewSet)
-router.register("organization", OrganizationViewSet, basename="organization")
+router.register("organizations", OrganizationViewSet)
+
 urlpatterns = router.urls
