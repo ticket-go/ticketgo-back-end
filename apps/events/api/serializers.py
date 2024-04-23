@@ -25,3 +25,5 @@ class EventsSerializer(serializers.ModelSerializer):
 
     tickets_sold = serializers.IntegerField(read_only=True)
     tickets_available = serializers.IntegerField(read_only=True)
+    status = serializers.CharField(source="get_status_display")
+    category = serializers.CharField(source="get_category_display")
