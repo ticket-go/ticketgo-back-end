@@ -8,13 +8,13 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('events', '0002_add_updated_by_and_more'),
-        ('organization', '0001_initial'),
+        ('organizations', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='event',
             name='organization',
-            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, related_name='event_organization', to='organization.organization', verbose_name='Organização'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='event_organization', to='organizations.organization', verbose_name='Organização'),
         ),
     ]

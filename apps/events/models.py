@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from apps.address.models import Address
-from apps.organization.models import Organization
+from apps.organizations.models import Organization
 from apps.core.models import BaseModel
 
 
@@ -77,8 +77,9 @@ class Event(BaseModel):
         Organization,
         verbose_name=_("Organização"),
         related_name="event_organization",
-        default=None,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
 
     class Meta:

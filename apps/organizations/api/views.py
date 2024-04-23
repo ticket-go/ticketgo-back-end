@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from apps.organization.api.serializers import OrganizationSerializer
+from apps.organizations.api.serializers import OrganizationSerializer
 from apps.events.models import Organization
 
 class OrganizationViewSet(viewsets.ModelViewSet):

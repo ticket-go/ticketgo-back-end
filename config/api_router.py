@@ -3,7 +3,7 @@ from rest_framework import routers
 from apps.address.api.views import AddressViewSet
 from apps.events.api.views import EventsViewSet
 from apps.tickets.api.views import TicketsViewSet
-from apps.organization.api.views import OrganizationViewSet
+from apps.organizations.api.views import OrganizationViewSet
 
 router = routers.SimpleRouter()
 router.register("events", EventsViewSet)

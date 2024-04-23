@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created at')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Updated at')),
                 ('name', models.CharField(max_length=255, verbose_name='Nome')),
-                ('company_regisration_number', models.CharField(max_length=14, verbose_name='CNPJ')),
+                ('company_registration_number', models.CharField(max_length=14, verbose_name='CNPJ')),
                 ('created_by', models.ForeignKey(null=True, on_delete=models.SET(apps.core.models.get_sentinel_user), related_name='created_%(app_label)s_%(class)s_set', to=settings.AUTH_USER_MODEL, verbose_name='Created by')),
                 ('updated_by', models.ForeignKey(null=True, on_delete=models.SET(apps.core.models.get_sentinel_user), related_name='updated_%(app_label)s_%(class)s_set', to=settings.AUTH_USER_MODEL, verbose_name='Updated by')),
             ],
