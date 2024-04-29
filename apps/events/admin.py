@@ -2,4 +2,4 @@ from django.contrib import admin
 from apps.events.models import Event
 
 # Register your models here.
-admin.register(Event)
+admin.site.register(Event)

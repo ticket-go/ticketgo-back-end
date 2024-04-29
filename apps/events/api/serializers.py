@@ -12,7 +12,9 @@ class EventsSerializer(serializers.ModelSerializer):
             "time",
             "description",
             "category",
+            "category_display",
             "status",
+            "status_display",
             "image",
             "ticket_value",
             "half_ticket_value",
@@ -25,5 +27,11 @@ class EventsSerializer(serializers.ModelSerializer):
 
     tickets_sold = serializers.IntegerField(read_only=True)
     tickets_available = serializers.IntegerField(read_only=True)
-    status = serializers.CharField(source="get_status_display")
-    category = serializers.CharField(source="get_category_display")
+    category_display = serializers.SerializerMethodField()
+    status_display = serializers.SerializerMethodField()
+    
+    def get_category_display(self, obj):
+        return obj.get_category_display()
+
+    def get_status_display(self, obj):
+        return obj.get_status_display()

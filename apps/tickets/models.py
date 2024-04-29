@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from apps.core.models import BaseModel
+from apps.financial.models import Purchase
 from apps.users.models import CustomUser
 from apps.events.models import Event
 
@@ -23,6 +24,13 @@ class Ticket(BaseModel):
         on_delete=models.PROTECT,
         related_name="linked_user",
         verbose_name=_("Usuário"),
+    )
+    purchase = models.ForeignKey(
+        Purchase,
+        on_delete=models.CASCADE,
+        related_name="linked_purchase",
+        verbose_name=_("Compra"),
+        null=True,
     )
 
     def save(self, *args, **kwargs):
