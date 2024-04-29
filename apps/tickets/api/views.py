@@ -16,27 +16,33 @@ class TicketsViewSet(viewsets.ModelViewSet):
         event_id = request.data.get("event")
         event = Event.objects.get(pk=event_id)
 
-        # Check if there are available tickets for the event
-        if event.tickets_available == 0:
-            return Response(
-                {"error": "Não há mais ingressos disponíveis para este evento."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Update the ticket count for the event
-        event.tickets_available -= 1
-        event.tickets_sold += 1
-        event.save()
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        half_ticket = serializer.validated_data.get("half_ticket", False)
+        is_half_ticket = True if half_ticket else False
+
+        # Check if there are available tickets for the event
+        if event.tickets_available == 0:
+            message = "Não há mais ingressos disponíveis para este evento."
+            return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
+        if is_half_ticket and event.half_tickets_available == 0:
+            message = "Não há mais ingressos do tipo meia-entrada disponíveis para este evento."
+            return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update the ticket count for the event
+        if is_half_ticket:
+            event.half_tickets_available -= 1
+        else:
+            event.tickets_available -= 1
+        event.tickets_sold += 1
+        event.save()
+
         # Check if there are half tickets for the event
         if not event.half_ticket_value:
-            return Response(
-                {"error": "Não há meia entrada disponível para este evento."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            message = "Não há meia entrada disponível para este evento."
+            return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
         purchase_id = request.data.get("purchase")
         purchase = Purchase.objects.get(pk=purchase_id)
@@ -56,10 +62,13 @@ class TicketsViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        event = instance.event
 
         # Update the ticket count for the event
-        event = instance.event
-        event.tickets_available += 1
+        if instance.half_ticket:
+            event.half_tickets_available += 1
+        else:
+            event.tickets_available += 1
         event.tickets_sold -= 1
         event.save()
 
