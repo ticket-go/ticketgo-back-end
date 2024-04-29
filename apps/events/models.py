@@ -49,23 +49,35 @@ class Event(BaseModel):
     )
     image = models.ImageField(upload_to="events", null=False, verbose_name=_("Banner"))
     ticket_value = models.DecimalField(
-        max_digits=10, decimal_places=2, verbose_name=_("Valor do ingresso")
+        max_digits=10,
+        decimal_places=2,
+        verbose_name=_("Valor do ingresso do tipo inteira"),
     )
     half_ticket_value = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        verbose_name=_("Meia entrada"),
+        verbose_name=_("Valor do ingresso do tipo meia-entrada"),
         null=True,
         blank=True,
     )
     ticket_quantity = models.IntegerField(
-        null=False, verbose_name=_("Quantidade de ingressos")
+        null=False, verbose_name=_("Quantidade de ingressos do tipo inteira")
+    )
+    half_ticket_quantity = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("Quantidade de ingressos do tipo meia-entrada"),
     )
     tickets_sold = models.IntegerField(
         default=0, verbose_name=_("Quantidade de ingressos vendidos")
     )
     tickets_available = models.IntegerField(
-        null=False, verbose_name=_("Quantidade de ingressos disponíveis")
+        null=False,
+        verbose_name=_("Quantidade de ingressos disponíveis do tipo inteira"),
+    )
+    half_tickets_available = models.IntegerField(
+        null=True,
+        verbose_name=_("Quantidade de ingressos disponíveis do tipo meia-entrada"),
     )
     address = models.ForeignKey(
         Address,
@@ -89,6 +101,7 @@ class Event(BaseModel):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.tickets_available = self.ticket_quantity
+            self.half_tickets_available = self.half_ticket_quantity
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -96,3 +109,11 @@ class Event(BaseModel):
 
     def get_absolute_url(self):
         return reverse("events_detail", kwargs={"pk": self.pk})
+
+    @property
+    def full_tickets_sold(self):
+        return self.ticket_quantity - self.tickets_available
+
+    @property
+    def half_tickets_sold(self):
+        return self.half_ticket_quantity - self.half_tickets_available
