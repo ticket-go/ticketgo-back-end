@@ -1,11 +1,13 @@
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.events.models import Event
+from django.shortcuts import get_object_or_404
 
+from apps.events.models import Event
+from apps.tickets.models import Ticket
 from apps.financial.models import Purchase
 from apps.tickets.api.serializers import TicketSerializer
-from apps.tickets.models import Ticket
 
 
 class TicketsViewSet(viewsets.ModelViewSet):
@@ -85,3 +87,31 @@ class TicketsViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="(?P<event_id>[^/.]+)/(?P<ticket_id>[^/.]+)/verify",
+    )
+    def verify(self, request, event_id=None, ticket_id=None):
+        hash_value = request.data.get("hash")
+        if not hash_value:
+            return Response(
+                {"error": "Hash not provided"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        ticket = get_object_or_404(
+            Ticket, id=ticket_id, event_id=event_id, hash=hash_value
+        )
+
+        if ticket.verified:
+            return Response(
+                {"message": "Ticket already verified"}, status=status.HTTP_200_OK
+            )
+
+        ticket.verified = True
+        ticket.save()
+
+        return Response(
+            {"message": "Ticket verified successfully"}, status=status.HTTP_200_OK
+        )
