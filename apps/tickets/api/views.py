@@ -13,10 +13,18 @@ from apps.tickets.api.serializers import TicketSerializer
 class TicketsViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    lookup_field = "uuid"
+
+    def get_event(self):
+        event_pk = self.kwargs.get("event_uuid")
+        return get_object_or_404(Event, uuid=event_pk)
+
+    def get_purchase(self):
+        purchase_pk = self.request.data.get("purchase")
+        return get_object_or_404(Purchase, uuid=purchase_pk)
 
     def create(self, request, *args, **kwargs):
-        event_id = request.data.get("event")
-        event = Event.objects.get(pk=event_id)
+        event = self.get_event()
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -46,21 +54,25 @@ class TicketsViewSet(viewsets.ModelViewSet):
             message = "Não há meia entrada disponível para este evento."
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
-        purchase_id = request.data.get("purchase")
-        purchase = Purchase.objects.get(pk=purchase_id)
-
+        purchase = self.get_purchase()
         # Update the purchase value
         half_ticket = serializer.validated_data.get("half_ticket", False)
         ticket_value = event.half_ticket_value if half_ticket else event.ticket_value
         purchase.value += ticket_value
         purchase.save()
 
+        serializer.validated_data["event"] = event
+        serializer.validated_data["user"] = request.user
+        serializer.validated_data["purchase"] = purchase
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -87,31 +99,3 @@ class TicketsViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @action(
-        detail=False,
-        methods=["post"],
-        url_path="(?P<event_id>[^/.]+)/(?P<ticket_id>[^/.]+)/verify",
-    )
-    def verify(self, request, event_id=None, ticket_id=None):
-        hash_value = request.data.get("hash")
-        if not hash_value:
-            return Response(
-                {"error": "Hash not provided"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        ticket = get_object_or_404(
-            Ticket, id=ticket_id, event_id=event_id, hash=hash_value
-        )
-
-        if ticket.verified:
-            return Response(
-                {"message": "Ticket already verified"}, status=status.HTTP_200_OK
-            )
-
-        ticket.verified = True
-        ticket.save()
-
-        return Response(
-            {"message": "Ticket verified successfully"}, status=status.HTTP_200_OK
-        )
