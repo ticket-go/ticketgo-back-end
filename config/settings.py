@@ -16,7 +16,7 @@ ACCESS_TOKEN=os.environ.get('MERCADO_PAGO_ACCESS_TOKEN')
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", ]
 
 DJANGO_APPS = [
     "django.contrib.admin",
