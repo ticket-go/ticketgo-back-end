@@ -6,3 +6,4 @@ from apps.events.models import Event
 class EventsViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventsSerializer
+    lookup_field = "uuid"
