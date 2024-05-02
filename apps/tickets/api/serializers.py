@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from apps.financial.models import Purchase
 from apps.tickets.models import Ticket
 
 
@@ -19,7 +20,9 @@ class TicketSerializer(serializers.ModelSerializer):
     hash = serializers.CharField(read_only=True)
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     event = serializers.ReadOnlyField(source="event.uuid", read_only=True)
-    purchase = serializers.ReadOnlyField(source="purchase.uuid", read_only=True)
+    purchase = serializers.SlugRelatedField(
+        slug_field="uuid", queryset=Purchase.objects.all()
+    )
 
 
 class VerifyTicketSerializer(serializers.Serializer):
