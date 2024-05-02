@@ -1,5 +1,5 @@
 from django.urls import path
-from apps.users.api.viewsets import CustomUserReadListViewSet, LoginViewSet, CustomUserViewSet, CustomUserUpdateViewSet, CustomUserChangePasswordViewSet, CustomUserChangeEmailViewSet, LogoutViewSet, SocialLoginViewSet
+from apps.users.api.views import CustomUserReadListViewSet, LoginViewSet, CustomUserViewSet, CustomUserUpdateViewSet, CustomUserChangePasswordViewSet, CustomUserChangeEmailViewSet, LogoutViewSet, SocialLoginViewSet
 
 urlpatterns = [
     path('register/', CustomUserViewSet.as_view(), name='register'),

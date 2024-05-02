@@ -160,6 +160,7 @@ class LogoutViewSet(APIView):
 class SocialLoginViewSet(APIView):
     authentication_classes = []
     permission_classes = []
+    serializer_class = None
 
     def get(self, request, *args, **kwargs):
         provider = kwargs.get("provider")

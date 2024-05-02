@@ -1,5 +1,4 @@
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
+from rest_framework import generics, status, viewsets
 from rest_framework.response import Response
 
 from django.shortcuts import get_object_or_404
@@ -7,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from apps.events.models import Event
 from apps.tickets.models import Ticket
 from apps.financial.models import Purchase
-from apps.tickets.api.serializers import TicketSerializer
+from apps.tickets.api.serializers import TicketSerializer, VerifyTicketSerializer
 
 
 class TicketsViewSet(viewsets.ModelViewSet):
@@ -99,3 +98,34 @@ class TicketsViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class VerifyTicketViewSet(generics.UpdateAPIView):
+    serializer_class = VerifyTicketSerializer
+
+    def update(self, request, *args, **kwargs):
+        event_uuid = kwargs.get("event_uuid")
+        ticket_uuid = kwargs.get("ticket_uuid")
+
+        hash_value = request.data.get("hash")
+        if not hash_value:
+            return Response(
+                {"error": "Hash não fornecida"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        event = get_object_or_404(Event, uuid=event_uuid)
+        ticket = get_object_or_404(
+            Ticket, uuid=ticket_uuid, event=event, hash=hash_value
+        )
+
+        if ticket.verified:
+            return Response(
+                {"message": "Ingresso já verificado!"}, status=status.HTTP_200_OK
+            )
+
+        ticket.verified = True
+        ticket.save()
+
+        return Response(
+            {"message": "Ingresso verificado com sucesso!"}, status=status.HTTP_200_OK
+        )

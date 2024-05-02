@@ -20,3 +20,7 @@ class TicketSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     event = serializers.ReadOnlyField(source="event.uuid", read_only=True)
     purchase = serializers.ReadOnlyField(source="purchase.uuid", read_only=True)
+
+
+class VerifyTicketSerializer(serializers.Serializer):
+    hash = serializers.CharField()
