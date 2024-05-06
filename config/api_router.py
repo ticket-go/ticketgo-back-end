@@ -9,6 +9,7 @@ from apps.events.api.views import EventsViewSet
 from apps.financial.api.views import PurchasesViewSet
 from apps.tickets.api.views import TicketsViewSet
 from apps.organizations.api.views import OrganizationViewSet
+from apps.payments.api.views import PaymentViewSet
 
 if settings.DEBUG:
     router = DefaultRouter()
@@ -22,5 +23,6 @@ events_router.register("tickets", TicketsViewSet, basename="event-tickets")
 router.register("addresses", AddressViewSet)
 router.register("organizations", OrganizationViewSet)
 router.register("purchases", PurchasesViewSet)
+router.register("payments", PaymentViewSet)
 
 urlpatterns = router.urls + events_router.urls
