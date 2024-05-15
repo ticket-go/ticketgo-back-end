@@ -6,7 +6,7 @@ from rest_framework_nested import routers
 
 from apps.address.api.views import AddressViewSet
 from apps.events.api.views import EventsViewSet
-from apps.financial.api.views import PurchasesViewSet
+from apps.financial.api.views import PaymentsViewSet, PurchasesViewSet
 from apps.tickets.api.views import TicketsViewSet
 from apps.organizations.api.views import OrganizationViewSet
 
@@ -22,5 +22,6 @@ events_router.register("tickets", TicketsViewSet, basename="event-tickets")
 router.register("addresses", AddressViewSet)
 router.register("organizations", OrganizationViewSet)
 router.register("purchases", PurchasesViewSet)
+router.register("payments", PaymentsViewSet)
 
 urlpatterns = router.urls + events_router.urls

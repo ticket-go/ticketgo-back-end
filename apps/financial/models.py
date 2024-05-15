@@ -20,10 +20,47 @@ class Purchase(BaseModel):
         null=False,
         verbose_name=_("Status"),
     )
-    id_user = models.ForeignKey(CustomUser, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(CustomUser, on_delete=models.DO_NOTHING)
 
     def __str__(self) -> str:
-        return self.id_user.username + " - " + str(self.value)
+        return self.user.username + " - " + str(self.value)
 
     def get_total_value(self):
         return sum(ticket.event.ticket_value for ticket in self.linked_purchase.all())
+
+
+class Payment(BaseModel):
+    PAYMENT_METHODS_CHOICES = (
+        ("PIX", _("Pix")),
+        ("CREDIT_CARD", _("Cartão de crédito")),
+    )
+
+    PAYMENT_STATUS_CHOICES = (
+        ("PENDING", _("Pendente")),
+        ("RECEIVED", _("Recebido")),
+        ("CONFIRMED", _("Confirmado")),
+        ("CANCELED", _("Cancelado")),
+    )
+
+    external_id = models.CharField(
+        max_length=50,
+        editable=False,
+        verbose_name=_("ID externo"),
+        null=True,
+        blank=True,
+    )
+    payment_type = models.CharField(
+        max_length=50,
+        choices=PAYMENT_METHODS_CHOICES,
+        verbose_name=_("Tipo do pagamento"),
+    )
+    status = models.CharField(
+        max_length=50,
+        choices=PAYMENT_STATUS_CHOICES,
+        default="PENDING",
+        verbose_name=_("Status"),
+    )
+    link_payment = models.CharField(
+        max_length=500, verbose_name=_("Link do pagamento"), null=True, blank=True
+    )
+    purchase = models.OneToOneField(Purchase, on_delete=models.CASCADE)
