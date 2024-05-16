@@ -1,11 +1,11 @@
 from django.urls import path
 
-from apps.financial.api.views import GeneratePaymentLinkAPIView
+from apps.financial.api.views import InvoicesAPIView
 
 urlpatterns = [
     path(
-        "generate_link",
-        GeneratePaymentLinkAPIView.as_view(),
-        name="generate_link",
+        "generate_invoice",
+        InvoicesAPIView.as_view(),
+        name="generate_invoices",
     ),
 ]

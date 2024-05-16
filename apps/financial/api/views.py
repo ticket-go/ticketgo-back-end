@@ -1,15 +1,15 @@
 import os
-import requests
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from drf_spectacular.utils import extend_schema
 
 from apps.financial.api.serializers import (
-    CreatePaymentLinkSerializer,
+    CreatePaymentSerializer,
     PaymentSerializer,
     PurchaseSerializer,
 )
+from apps.financial.asaas import AssasPaymentClient
 from apps.financial.models import Payment, Purchase
 
 from rest_framework.views import APIView
@@ -37,55 +37,45 @@ class PaymentsViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class GeneratePaymentLinkAPIView(APIView):
-    @extend_schema(request=CreatePaymentLinkSerializer)
+class InvoicesAPIView(APIView):
+    @extend_schema(request=CreatePaymentSerializer)
     def post(self, request):
-        serializer = CreatePaymentLinkSerializer(data=request.data)
+        serializer = CreatePaymentSerializer(data=request.data)
         if serializer.is_valid():
             payment_uuid = serializer.validated_data["payment"]
             payment = Payment.objects.get(uuid=payment_uuid)
 
-            url = "https://sandbox.asaas.com/api/v3/paymentLinks"
-            headers = {
-                "Content-Type": "application/json",
-                "access_token": ACCESS_TOKEN_ASASS,
-            }
+            client = AssasPaymentClient()
+            customer = client.create_or_update_customer(payment.purchase.user)
+            data = self.prepare_payment_data(payment, customer)
+            response = self.send_payment_request(data)
 
-            max_installment_count = 0
-            if payment.purchase.value > 50 and payment.purchase.value < 100:
-                max_installment_count = 2
-            elif payment.purchase.value > 10 and payment.purchase.value < 200:
-                max_installment_count = 4
+            if response:
+                self.update_payment(payment, response)
+                return Response(response, status=status.HTTP_200_OK)
             else:
-                max_installment_count = 5
-
-            end_date = datetime.now() + timedelta(days=1)
-            end_date_str = end_date.strftime("%Y-%m-%d")
-
-            data = {
-                "name": "Venda de tickets - TicketGo",
-                "description": "Compre seus ingressos online de forma rápida e segura! Não perca tempo, garanta seus ingressos agora! ",
-                "value": float(payment.purchase.value),
-                "billingType": payment.payment_type,
-                "chargeType": (
-                    "DETACHED" if payment.payment_type == "PIX" else "INSTALLMENT"
-                ),
-                "dueDateLimitDays": 1,
-                "maxInstallmentCount": max_installment_count,
-                "endDate": end_date_str,
-            }
-            response = requests.post(url, headers=headers, json=data)
-
-            if response.status_code == 200:
-                result = response.json()
-                link_payment = result["url"]
-                external_id = result["id"]
-
-                payment.link_payment = link_payment
-                payment.external_id = external_id
-                payment.save()
-
-                return Response(result, status=status.HTTP_200_OK)
-            else:
-                return Response(response.json(), status=response.status_code)
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def prepare_payment_data(self, payment, customer):
+        end_date = datetime.now() + timedelta(days=1)
+        end_date_str = end_date.strftime("%Y-%m-%d")
+        data = {
+            "customer": customer.get("id"),
+            "billingType": "UNDEFINED",
+            "value": float(payment.purchase.value),
+            "dueDate": end_date_str,
+            "description": "Compre seus ingressos online de forma rápida e segura!",
+            "externalReference": str(payment.uuid),
+        }
+        return data
+
+    def send_payment_request(self, data):
+        client = AssasPaymentClient()
+        response = client.send_payment_request(data)
+        return response
+
+    def update_payment(self, payment, result):
+        payment.link_payment = result["invoiceUrl"]
+        payment.external_id = result["id"]
+        payment.save()

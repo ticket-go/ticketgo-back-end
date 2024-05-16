@@ -29,7 +29,7 @@ class PaymentSerializer(serializers.ModelSerializer):
     link_payment = serializers.CharField(read_only=True)
 
 
-class CreatePaymentLinkSerializer(serializers.Serializer):
+class CreatePaymentSerializer(serializers.Serializer):
     payment = serializers.UUIDField()
 
     def validate_payment_id(self, value):
@@ -38,3 +38,19 @@ class CreatePaymentLinkSerializer(serializers.Serializer):
         except Payment.DoesNotExist:
             raise serializers.ValidationError("Pagamento não encontrado.")
         return payment
+
+
+class AsaasCustomerSerializer(serializers.Serializer):
+    externalReference = serializers.CharField(source="user_id")
+    name = serializers.SerializerMethodField()
+    cpfCnpj = serializers.CharField(source="cpf")
+    email = serializers.EmailField()
+    phone = serializers.CharField()
+    address = serializers.CharField(source="address.street")
+    addressNumber = serializers.CharField(source="address.number")
+    complement = serializers.CharField(source="address.complement")
+    province = serializers.CharField(source="address.district")
+    postalCode = serializers.CharField(source="address.zip_code")
+
+    def get_name(self, obj):
+        return obj.get_full_name()
