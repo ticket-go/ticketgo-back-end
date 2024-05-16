@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from apps.financial.models import Purchase
 from apps.tickets.models import Ticket
 
 

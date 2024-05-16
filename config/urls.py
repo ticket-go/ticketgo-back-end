@@ -16,6 +16,8 @@ urlpatterns = [
     path("api/payments/", include("apps.financial.urls")),
     # django-allauth
     path("accounts/", include("allauth.urls")),
+    # payments
+    path("payments/", include("apps.payments.urls")),
     #
     path("api/", include("config.api_router"), name="api"),
     path("api/users/", include("apps.users.urls")),
