@@ -3,6 +3,7 @@ import requests
 from requests import HTTPError
 from dotenv import load_dotenv
 from functools import partialmethod
+
 from .api.serializers import AsaasCustomerSerializer
 
 
@@ -73,3 +74,8 @@ class AssasPaymentClient:
 
     def send_payment_request(self, data):
         return self._api_post("/payments", json=data)
+
+    def list_payments(self, data=None):
+        if data:
+            return self._api_get("/payments", json=data)
+        return self._api_get("/payments")

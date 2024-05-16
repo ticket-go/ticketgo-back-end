@@ -27,6 +27,13 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     external_id = serializers.CharField(read_only=True)
     link_payment = serializers.CharField(read_only=True)
+    purchase = serializers.CharField(source="purchase.uuid")
+
+    def create(self, validated_data):
+        purchase_uuid = validated_data.pop("purchase")
+        purchase = Purchase.objects.get(uuid=purchase_uuid["uuid"])
+        payment = Payment.objects.create(purchase=purchase, **validated_data)
+        return payment
 
 
 class CreatePaymentSerializer(serializers.Serializer):
@@ -38,6 +45,10 @@ class CreatePaymentSerializer(serializers.Serializer):
         except Payment.DoesNotExist:
             raise serializers.ValidationError("Pagamento não encontrado.")
         return payment
+
+
+class ListPaymentsSerializer(serializers.Serializer):
+    customer = serializers.CharField(required=False)
 
 
 class AsaasCustomerSerializer(serializers.Serializer):

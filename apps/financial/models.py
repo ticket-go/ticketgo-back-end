@@ -33,6 +33,8 @@ class Payment(BaseModel):
     PAYMENT_METHODS_CHOICES = (
         ("PIX", _("Pix")),
         ("CREDIT_CARD", _("Cartão de crédito")),
+        ("BOLETO", _("Cartão de crédito")),
+        ("UNDEFINED", _("Cartão de crédito")),
     )
 
     PAYMENT_STATUS_CHOICES = (

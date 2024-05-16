@@ -6,6 +6,7 @@ from drf_spectacular.utils import extend_schema
 
 from apps.financial.api.serializers import (
     CreatePaymentSerializer,
+    ListPaymentsSerializer,
     PaymentSerializer,
     PurchaseSerializer,
 )
@@ -38,6 +39,21 @@ class PaymentsViewSet(viewsets.ModelViewSet):
 
 
 class InvoicesAPIView(APIView):
+    @extend_schema(request=ListPaymentsSerializer)
+    def get(self, request):
+        serializer = ListPaymentsSerializer(data=request.query_params)
+        if serializer.is_valid():
+            customer = serializer.validated_data.get("customer")
+            client = AssasPaymentClient()
+            if customer:
+                data = {"customer": customer}
+                payments = client.list_payments(data)
+                return Response(payments, status=status.HTTP_200_OK)
+            else:
+                payments = client.list_payments()
+                return Response(payments, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @extend_schema(request=CreatePaymentSerializer)
     def post(self, request):
         serializer = CreatePaymentSerializer(data=request.data)
@@ -73,6 +89,7 @@ class InvoicesAPIView(APIView):
     def send_payment_request(self, data):
         client = AssasPaymentClient()
         response = client.send_payment_request(data)
+
         return response
 
     def update_payment(self, payment, result):
