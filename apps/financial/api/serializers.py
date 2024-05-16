@@ -27,6 +27,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     external_id = serializers.CharField(read_only=True)
     link_payment = serializers.CharField(read_only=True)
+    payment_type = serializers.CharField(read_only=True)
     purchase = serializers.CharField(source="purchase.uuid")
 
     def create(self, validated_data):
@@ -36,7 +37,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         return payment
 
 
-class CreatePaymentSerializer(serializers.Serializer):
+class CreateInvoiceSerializer(serializers.Serializer):
     payment = serializers.UUIDField()
 
     def validate_payment_id(self, value):

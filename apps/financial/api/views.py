@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from drf_spectacular.utils import extend_schema
 
 from apps.financial.api.serializers import (
-    CreatePaymentSerializer,
+    CreateInvoiceSerializer,
     ListPaymentsSerializer,
     PaymentSerializer,
     PurchaseSerializer,
@@ -37,8 +37,8 @@ class PaymentsViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-
 class InvoicesAPIView(APIView):
+
     @extend_schema(request=ListPaymentsSerializer)
     def get(self, request):
         serializer = ListPaymentsSerializer(data=request.query_params)
@@ -54,9 +54,9 @@ class InvoicesAPIView(APIView):
                 return Response(payments, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(request=CreatePaymentSerializer)
+    @extend_schema(request=CreateInvoiceSerializer)
     def post(self, request):
-        serializer = CreatePaymentSerializer(data=request.data)
+        serializer = CreateInvoiceSerializer(data=request.data)
         if serializer.is_valid():
             payment_uuid = serializer.validated_data["payment"]
             payment = Payment.objects.get(uuid=payment_uuid)

@@ -30,18 +30,10 @@ class Purchase(BaseModel):
 
 
 class Payment(BaseModel):
-    PAYMENT_METHODS_CHOICES = (
-        ("PIX", _("Pix")),
-        ("CREDIT_CARD", _("Cartão de crédito")),
-        ("BOLETO", _("Cartão de crédito")),
-        ("UNDEFINED", _("Cartão de crédito")),
-    )
-
     PAYMENT_STATUS_CHOICES = (
         ("PENDING", _("Pendente")),
         ("RECEIVED", _("Recebido")),
         ("CONFIRMED", _("Confirmado")),
-        ("CANCELED", _("Cancelado")),
     )
 
     external_id = models.CharField(
@@ -53,7 +45,8 @@ class Payment(BaseModel):
     )
     payment_type = models.CharField(
         max_length=50,
-        choices=PAYMENT_METHODS_CHOICES,
+        null=True,
+        blank=True,
         verbose_name=_("Tipo do pagamento"),
     )
     status = models.CharField(

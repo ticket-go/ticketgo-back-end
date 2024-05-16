@@ -1,9 +1,14 @@
 import os
 import requests
+import schedule
+import threading
+import time
+
 from requests import HTTPError
 from dotenv import load_dotenv
 from functools import partialmethod
 
+from apps.financial.models import Payment
 from .api.serializers import AsaasCustomerSerializer
 
 
@@ -79,3 +84,38 @@ class AssasPaymentClient:
         if data:
             return self._api_get("/payments", json=data)
         return self._api_get("/payments")
+
+    def check_payment_status(self):
+        response = self._api_get("/payments")
+        all_payments = response["data"]
+        for payment in all_payments:
+            try:
+                existing_payment = Payment.objects.get(external_id=payment["id"])
+                existing_payment.status = payment["status"]
+                existing_payment.payment_type = payment["billingType"]
+                existing_payment.save()
+            except Payment.DoesNotExist:
+                pass
+
+
+# polling status check payments
+
+client = AssasPaymentClient()
+
+
+def check_payments():
+    schedule.every(5).minutes.do(client.check_payment_status)
+
+
+check_payments()
+
+
+# to run in the background
+def schedule_thread():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+# # config to run in the background
+threading.Thread(target=schedule_thread).start()
