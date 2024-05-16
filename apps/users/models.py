@@ -14,10 +14,9 @@ from apps.utils.cpf_cnpj.models import CPFField
 
 class CustomUser(AbstractUser):
     user_id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    phone = models.CharField(max_length=12, blank=True, verbose_name=_("Telefone"))
-    cpf = CPFField(blank=False, null=False, verbose_name=_("CPF"))
+    phone = models.CharField(max_length=12, verbose_name=_("Telefone"))
+    cpf = CPFField(verbose_name=_("CPF"))
     birthdate = models.DateField(
-        blank=True,
         null=True,
         validators=[MaxValueValidator(limit_value=date.today)],
         verbose_name=_("Data de Nascimento"),
@@ -32,9 +31,8 @@ class CustomUser(AbstractUser):
     address = models.ForeignKey(
         "address.Address",
         related_name="user_address",
-        on_delete=models.SET_NULL,
+        on_delete=models.DO_NOTHING,
         null=True,
-        blank=True,
         verbose_name=_("Endereço"),
     )
     organization = models.ForeignKey(
