@@ -98,24 +98,24 @@ class AssasPaymentClient:
                 pass
 
 
-# polling status check payments
+# # polling status check payments
 
-client = AssasPaymentClient()
-
-
-def check_payments():
-    schedule.every(5).minutes.do(client.check_payment_status)
+# client = AssasPaymentClient()
 
 
-check_payments()
+# def check_payments():
+#     schedule.every(1).minutes.do(client.check_payment_status)
 
 
-# to run in the background
-def schedule_thread():
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+# check_payments()
+
+
+# # to run in the background
+# def schedule_thread():
+#     while True:
+#         schedule.run_pending()
+#         time.sleep(1)
 
 
 # # config to run in the background
-threading.Thread(target=schedule_thread).start()
+# threading.Thread(target=schedule_thread).start()
