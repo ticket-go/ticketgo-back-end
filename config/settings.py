@@ -1,14 +1,22 @@
 from pathlib import Path
-import os
+import environ, os
+import dotenv
+
+dotenv.load_dotenv()
+
+env = environ.Env()
+environ.Env.read_env()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-^v87bu1ey^@uvb5+6toug0-dcnc_!$t1$yl$8c4d48lpvp!i$$"
 
+PUBLIC_KEY=os.environ.get('MERCADO_PAGO_PUBLIC_KEY')
+ACCESS_TOKEN=os.environ.get('MERCADO_PAGO_ACCESS_TOKEN')
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", ]
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -27,6 +35,7 @@ LOCAL_APPS = [
     "apps.tickets",
     "apps.organizations",
     "apps.financial",
+    "apps.payments",
 ]
 
 THIRD_PARTY_APPS = [
