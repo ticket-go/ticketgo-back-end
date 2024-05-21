@@ -32,7 +32,6 @@ LOCAL_APPS = [
     "apps.tickets",
     "apps.organizations",
     "apps.financial",
-    "apps.payments",
 ]
 
 THIRD_PARTY_APPS = [
