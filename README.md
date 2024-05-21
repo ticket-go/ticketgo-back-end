@@ -39,7 +39,7 @@ ASAAS_ACCESS_TOKEN
 python manage.py migrate
 ```
 
-### Croar superusuário 
+### Criar superusuário 
 ```
 python manage.py createsuperuser
 ```
