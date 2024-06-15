@@ -15,7 +15,7 @@ from apps.financial.models import Payment, Purchase
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, permissions
 
 
 load_dotenv()
@@ -27,18 +27,23 @@ class PurchasesViewSet(viewsets.ModelViewSet):
     queryset = Purchase.objects.all()
     serializer_class = PurchaseSerializer
     lookup_field = "uuid"
+    permission_classes = [permissions.IsAuthenticated]
+
 
 
 class PaymentsViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     lookup_field = "uuid"
+    permission_classes = [permissions.IsAuthenticated]
+
 
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 class InvoicesAPIView(APIView):
-
+    permission_classes = [permissions.IsAuthenticated]
+    
     @extend_schema(request=ListPaymentsSerializer)
     def get(self, request):
         serializer = ListPaymentsSerializer(data=request.query_params)
