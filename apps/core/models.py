@@ -9,8 +9,8 @@ CustomUser = get_user_model()
 
 
 def get_sentinel_user():
-    return get_user_model.objects.get_or_create(username="deleted")[0]
-
+    User = get_user_model()  
+    return User.objects.get_or_create(username="deleted")[0]
 
 class UUIDModel(models.Model):
     uuid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
