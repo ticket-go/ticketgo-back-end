@@ -32,6 +32,11 @@ pip install -r requirements.txt
 ### Criar .env com variáveis de ambiente 
 ```
 ASAAS_ACCESS_TOKEN
+EMAIL_HOST 
+EMAIL_PORT 
+EMAIL_USE_TLS 
+EMAIL_HOST_USER 
+EMAIL_HOST_PASSWORD 
 ```
 
 ### Aplicar migrações 
