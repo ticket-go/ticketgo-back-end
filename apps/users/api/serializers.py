@@ -8,26 +8,29 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = models.CustomUser
         fields = "__all__"
 
-    def create_user(self, validated_data):
-
-        user = models.CustomUser.objects.create_user(
-            username=validated_data["username"],
-            password=validated_data["password"],
-        )
-        return user
-
 
 class CustomUserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CustomUser
         fields = [
+            "username",
             "first_name",
             "last_name",
             "phone",
+            "email",
             "gender",
+            "privileged",
             "address",
             "organization",
         ]
+
+        extra_kwargs = {field: {"required": False} for field in fields}
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 
 class CustomUserChangePasswordSerializer(serializers.Serializer):
