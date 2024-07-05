@@ -1,5 +1,13 @@
+import os
+import qrcode
+from io import BytesIO
+from django.core.mail import EmailMessage
+
+from config import settings
 from rest_framework import generics, status, viewsets, permissions
 from rest_framework.response import Response
+from rest_framework.decorators import action
+
 
 from django.shortcuts import get_object_or_404
 
@@ -99,6 +107,50 @@ class TicketsViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        methods=["get"],
+        detail=True,
+        url_path="send-ticket-email",
+        url_name="send_ticket_email",
+    )
+    def send_ticket_to_user_email(self, request, event_uuid=None, uuid=None):
+        try:
+            ticket = self.get_object()
+            qr_img_bytes = self.generate_qr_code(ticket.hash)
+            self.send_email_with_attachment(ticket, qr_img_bytes)
+            return Response({"detail": "E-mail enviado com sucesso."})
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+
+    def generate_qr_code(self, data):
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(data)
+        qr.make(fit=True)
+        qr_img = qr.make_image(fill="black", back_color="white")
+
+        qr_img_bytes = BytesIO()
+        qr_img.save(qr_img_bytes)
+        qr_img_bytes.seek(0)
+        return qr_img_bytes
+
+    def send_email_with_attachment(self, ticket, attachment):
+        subject = "Seu ingresso está pronto! - TicketGo"
+        message = f"""
+        Olá {ticket.user.username},
+        
+        Segue seu ingresso referente ao evento {ticket.event.name}:
+        """
+        email = EmailMessage(
+            subject, message, os.getenv("EMAIL_HOST_USER"), [ticket.user.email]
+        )
+        email.attach("ticket_qr.png", attachment.read(), "image/png")
+        email.send()
 
 
 class VerifyTicketViewSet(generics.UpdateAPIView):

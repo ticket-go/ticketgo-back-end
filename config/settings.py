@@ -13,7 +13,10 @@ SECRET_KEY = "django-insecure-^v87bu1ey^@uvb5+6toug0-dcnc_!$t1$yl$8c4d48lpvp!i$$
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", ]
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+]
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -192,3 +195,12 @@ SPECTACULAR_SETTINGS = {
     "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
     "VERSION": "1.0.0",
 }
+
+
+# django.core.mail 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = (os.getenv("EMAIL_HOST"))
+EMAIL_PORT = (os.getenv("EMAIL_PORT"))
+EMAIL_USE_TLS = (os.getenv("EMAIL_USE_TLS"))
+EMAIL_HOST_USER = (os.getenv("EMAIL_HOST_USER"))
+EMAIL_HOST_PASSWORD = (os.getenv("EMAIL_HOST_PASSWORD"))
