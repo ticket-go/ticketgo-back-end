@@ -1,22 +1,45 @@
-from django.contrib.auth import authenticate, logout
+from django.contrib.auth import authenticate, logout, get_user_model
 from django.contrib.auth.hashers import check_password
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from apps.users.api import serializers
 from apps.users.models import CustomUser
 
+CustomUser = get_user_model()
 
-class CustomUserReadListViewSet(generics.ListAPIView):
+
+class UserViewSet(
+    RetrieveModelMixin, ListModelMixin, UpdateModelMixin, viewsets.GenericViewSet
+):
+    serializer_class = serializers.CustomUserUpdateSerializer
     queryset = CustomUser.objects.all()
-    serializer_class = serializers.CustomUserSerializer
-    permission_classes = [IsAuthenticated]
+    lookup_field = "user_id"
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        new_email = serializer.validated_data.get("email", None)
+
+        if new_email and CustomUser.objects.filter(email=new_email).exists():
+            return Response(
+                {"error": "Este endereço de e-mail já está em uso por outro usuário."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
 
 
 class CustomUserViewSet(generics.CreateAPIView):
@@ -28,10 +51,28 @@ class CustomUserViewSet(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
+            email = serializer.validated_data.get("email", None)
+            if email and CustomUser.objects.filter(email=email).exists():
+                return Response(
+                    {
+                        "error": "Este endereço de e-mail já está em uso por outro usuário."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-            password = serializer.validated_data.get("password")
-
-            user = serializer.create_user(serializer.validated_data)
+            user = CustomUser.objects.create_user(
+                username=serializer.validated_data.get("username"),
+                cpf=serializer.validated_data.get("cpf"),
+                email=serializer.validated_data.get("email"),
+                first_name=serializer.validated_data.get("first_name"),
+                last_name=serializer.validated_data.get("last_name"),
+                phone=serializer.validated_data.get("phone"),
+                birthdate=serializer.validated_data.get("birthdate"),
+                gender=serializer.validated_data.get("gender"),
+                address=serializer.validated_data.get("address"),
+                privileged=serializer.validated_data.get("privileged"),
+                password=serializer.validated_data.get("password"),
+            )
 
             return Response(
                 {"TicketGo": f"O usuário {user.username} foi registrado com sucesso."},
@@ -42,77 +83,34 @@ class CustomUserViewSet(generics.CreateAPIView):
 
 
 class CustomUserChangePasswordViewSet(generics.UpdateAPIView):
-
     serializer_class = serializers.CustomUserChangePasswordSerializer
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        serializer = serializers.CustomUserChangePasswordSerializer(data=request.data)
-        if serializer.is_valid():
-            user = request.user
-            old_password = serializer.validated_data["old_password"]
-            new_password = serializer.validated_data["new_password"]
+    def get_object(self):
+        user_id = self.kwargs.get("user_id")
+        return get_object_or_404(get_user_model(), user_id=user_id)
 
-            if not check_password(old_password, user.password):
-                return Response(
-                    {"error": "A senha antiga fornecida está incorreta."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+    def update(self, request, *args, **kwargs):
+        user = self.get_object()
+        self.check_object_permissions(request, user)
 
-            user.set_password(new_password)
-            user.save()
-
-            return Response(
-                {"message": "Senha alterada com sucesso."}, status=status.HTTP_200_OK
-            )
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class CustomUserChangeEmailViewSet(generics.GenericAPIView):
-
-    permission_classes = [IsAuthenticated]
-    serializer_class = serializers.CustomUserChangeEmailSerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        new_email = serializer.validated_data.get("new_email")
+        old_password = serializer.validated_data.get("old_password")
+        new_password = serializer.validated_data.get("new_password")
 
-        if CustomUser.objects.filter(email=new_email).exists():
+        if not check_password(old_password, user.password):
             return Response(
-                {"error": "Este endereço de e-mail já está em uso por outro usuário."},
+                {"detail": "Senha antiga incorreta."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user = request.user
-        user.email = new_email
+        user.set_password(new_password)
         user.save()
 
         return Response(
-            {"message": "Seu endereço de e-mail foi alterado com sucesso."},
-            status=status.HTTP_200_OK,
-        )
-
-
-class CustomUserUpdateViewSet(generics.UpdateAPIView):
-
-    serializer_class = serializers.CustomUserUpdateSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(
-            {"message": "Seus dados foram editados com sucesso."},
-            status=status.HTTP_200_OK,
+            {"detail": "Senha alterada com sucesso."}, status=status.HTTP_200_OK
         )
 
 

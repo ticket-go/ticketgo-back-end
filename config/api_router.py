@@ -1,5 +1,6 @@
 from django.conf import settings
 
+from apps.users.api.views import UserViewSet
 from rest_framework import routers
 from rest_framework.routers import DefaultRouter, SimpleRouter
 from rest_framework_nested import routers
@@ -23,5 +24,6 @@ router.register("addresses", AddressViewSet)
 router.register("organizations", OrganizationViewSet)
 router.register("purchases", PurchasesViewSet)
 router.register("payments", PaymentsViewSet)
+router.register("users", UserViewSet)
 
 urlpatterns = router.urls + events_router.urls
