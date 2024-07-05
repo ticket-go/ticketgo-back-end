@@ -8,7 +8,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = models.CustomUser
         fields = "__all__"
 
-    def create_user(self, validated_data):
+    def create(self, validated_data):
 
         user = models.CustomUser.objects.create_user(
             username=validated_data["username"],

@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, logout
+from django.contrib.auth import authenticate, logout, get_user_model
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import redirect
 
@@ -12,6 +12,8 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from apps.users.api import serializers
 from apps.users.models import CustomUser
+
+CustomUser = get_user_model()
 
 
 class UserViewSet(
@@ -32,9 +34,18 @@ class CustomUserViewSet(generics.CreateAPIView):
 
         if serializer.is_valid():
 
-            password = serializer.validated_data.get("password")
-
-            user = serializer.create_user(serializer.validated_data)
+            user = CustomUser.objects.create_user(
+                username=serializer.validated_data.get("username"),
+                cpf=serializer.validated_data.get("cpf"),
+                first_name=serializer.validated_data.get("first_name"),
+                last_name=serializer.validated_data.get("last_name"),
+                phone=serializer.validated_data.get("phone"),
+                birthdate=serializer.validated_data.get("birthdate"),
+                gender=serializer.validated_data.get("gender"),
+                address=serializer.validated_data.get("address"),
+                privileged=serializer.validated_data.get("privileged"),
+                password=serializer.validated_data.get("password"),
+            )
 
             return Response(
                 {"TicketGo": f"O usuário {user.username} foi registrado com sucesso."},
