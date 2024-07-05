@@ -8,19 +8,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = models.CustomUser
         fields = "__all__"
 
-    def create(self, validated_data):
-
-        user = models.CustomUser.objects.create_user(
-            username=validated_data["username"],
-            password=validated_data["password"],
-        )
-        return user
-
 
 class CustomUserUpdateSerializer(serializers.ModelSerializer):
-
-    email = serializers.EmailField(read_only=True)
-
     class Meta:
         model = models.CustomUser
         fields = [
@@ -39,8 +28,7 @@ class CustomUserUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
-            if attr != "email":
-                setattr(instance, attr, value)
+            setattr(instance, attr, value)
         instance.save()
         return instance
 

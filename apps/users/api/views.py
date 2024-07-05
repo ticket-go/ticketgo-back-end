@@ -23,6 +23,24 @@ class UserViewSet(
     queryset = CustomUser.objects.all()
     lookup_field = "user_id"
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        new_email = serializer.validated_data.get("email", None)
+
+        if new_email and CustomUser.objects.filter(email=new_email).exists():
+            return Response(
+                {"error": "Este endereço de e-mail já está em uso por outro usuário."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
 
 class CustomUserViewSet(generics.CreateAPIView):
 
@@ -33,10 +51,19 @@ class CustomUserViewSet(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
+            email = serializer.validated_data.get("email", None)
+            if email and CustomUser.objects.filter(email=email).exists():
+                return Response(
+                    {
+                        "error": "Este endereço de e-mail já está em uso por outro usuário."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             user = CustomUser.objects.create_user(
                 username=serializer.validated_data.get("username"),
                 cpf=serializer.validated_data.get("cpf"),
+                email=serializer.validated_data.get("email"),
                 first_name=serializer.validated_data.get("first_name"),
                 last_name=serializer.validated_data.get("last_name"),
                 phone=serializer.validated_data.get("phone"),
@@ -81,33 +108,6 @@ class CustomUserChangePasswordViewSet(generics.UpdateAPIView):
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class CustomUserChangeEmailViewSet(generics.GenericAPIView):
-
-    permission_classes = [IsAuthenticated]
-    serializer_class = serializers.CustomUserChangeEmailSerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        new_email = serializer.validated_data.get("new_email")
-
-        if CustomUser.objects.filter(email=new_email).exists():
-            return Response(
-                {"error": "Este endereço de e-mail já está em uso por outro usuário."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        user = request.user
-        user.email = new_email
-        user.save()
-
-        return Response(
-            {"message": "Seu endereço de e-mail foi alterado com sucesso."},
-            status=status.HTTP_200_OK,
-        )
 
 
 class LoginViewSet(APIView):
