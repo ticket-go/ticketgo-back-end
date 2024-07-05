@@ -2,10 +2,11 @@ from django.contrib.auth import authenticate, logout
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import redirect
 
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
@@ -13,10 +14,12 @@ from apps.users.api import serializers
 from apps.users.models import CustomUser
 
 
-class CustomUserReadListViewSet(generics.ListAPIView):
+class UserViewSet(
+    RetrieveModelMixin, ListModelMixin, UpdateModelMixin, viewsets.GenericViewSet
+):
+    serializer_class = serializers.CustomUserUpdateSerializer
     queryset = CustomUser.objects.all()
-    serializer_class = serializers.CustomUserSerializer
-    permission_classes = [IsAuthenticated]
+    lookup_field = "user_id"
 
 
 class CustomUserViewSet(generics.CreateAPIView):
@@ -92,26 +95,6 @@ class CustomUserChangeEmailViewSet(generics.GenericAPIView):
 
         return Response(
             {"message": "Seu endereço de e-mail foi alterado com sucesso."},
-            status=status.HTTP_200_OK,
-        )
-
-
-class CustomUserUpdateViewSet(generics.UpdateAPIView):
-
-    serializer_class = serializers.CustomUserUpdateSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(
-            {"message": "Seus dados foram editados com sucesso."},
             status=status.HTTP_200_OK,
         )
 

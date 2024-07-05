@@ -18,16 +18,31 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class CustomUserUpdateSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField(read_only=True)
+
     class Meta:
         model = models.CustomUser
         fields = [
+            "username",
             "first_name",
             "last_name",
             "phone",
+            "email",
             "gender",
+            "privileged",
             "address",
             "organization",
         ]
+
+        extra_kwargs = {field: {"required": False} for field in fields}
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            if attr != "email":
+                setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 
 class CustomUserChangePasswordSerializer(serializers.Serializer):
