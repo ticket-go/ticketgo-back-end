@@ -1,12 +1,12 @@
 from django.contrib.auth import authenticate, logout, get_user_model
 from django.contrib.auth.hashers import check_password
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 
 from rest_framework import generics, status, viewsets
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
@@ -83,31 +83,35 @@ class CustomUserViewSet(generics.CreateAPIView):
 
 
 class CustomUserChangePasswordViewSet(generics.UpdateAPIView):
-
     serializer_class = serializers.CustomUserChangePasswordSerializer
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        serializer = serializers.CustomUserChangePasswordSerializer(data=request.data)
-        if serializer.is_valid():
-            user = request.user
-            old_password = serializer.validated_data["old_password"]
-            new_password = serializer.validated_data["new_password"]
+    def get_object(self):
+        user_id = self.kwargs.get("user_id")
+        return get_object_or_404(get_user_model(), user_id=user_id)
 
-            if not check_password(old_password, user.password):
-                return Response(
-                    {"error": "A senha antiga fornecida está incorreta."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+    def update(self, request, *args, **kwargs):
+        user = self.get_object()
+        self.check_object_permissions(request, user)
 
-            user.set_password(new_password)
-            user.save()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
+        old_password = serializer.validated_data.get("old_password")
+        new_password = serializer.validated_data.get("new_password")
+
+        if not check_password(old_password, user.password):
             return Response(
-                {"message": "Senha alterada com sucesso."}, status=status.HTTP_200_OK
+                {"detail": "Senha antiga incorreta."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(new_password)
+        user.save()
+
+        return Response(
+            {"detail": "Senha alterada com sucesso."}, status=status.HTTP_200_OK
+        )
 
 
 class LoginViewSet(APIView):
