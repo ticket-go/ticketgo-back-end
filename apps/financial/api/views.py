@@ -30,33 +30,26 @@ class PurchasesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-
 class PaymentsViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     lookup_field = "uuid"
     permission_classes = [permissions.IsAuthenticated]
 
-
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+
 class InvoicesAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    
+
     @extend_schema(request=ListPaymentsSerializer)
     def get(self, request):
         serializer = ListPaymentsSerializer(data=request.query_params)
         if serializer.is_valid():
-            customer = serializer.validated_data.get("customer")
             client = AssasPaymentClient()
-            if customer:
-                data = {"customer": customer}
-                payments = client.list_payments(data)
-                return Response(payments, status=status.HTTP_200_OK)
-            else:
-                payments = client.list_payments()
-                return Response(payments, status=status.HTTP_200_OK)
+            payments = client.list_payments()
+            return Response(payments, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(request=CreateInvoiceSerializer)
