@@ -30,6 +30,11 @@ class TicketsViewSet(viewsets.ModelViewSet):
     def get_purchase(self):
         purchase_pk = self.request.data.get("purchase")
         return get_object_or_404(Purchase, uuid=purchase_pk)
+    
+    def get_queryset(self):
+        event_uuid = self.kwargs.get("event_uuid")
+        event = get_object_or_404(Event, uuid=event_uuid)
+        return Ticket.objects.filter(event=event)
 
     def create(self, request, *args, **kwargs):
         event = self.get_event()
