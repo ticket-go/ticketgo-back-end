@@ -42,6 +42,12 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
+## Após realizar as migrações, Carregue os dados fictícios
+
+```
+python manage.py loaddata initial_data.json
+```
+
 ### Criar superusuário
 
 ```
