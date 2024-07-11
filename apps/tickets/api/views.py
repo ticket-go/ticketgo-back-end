@@ -145,15 +145,40 @@ class TicketsViewSet(viewsets.ModelViewSet):
         return qr_img_bytes
 
     def send_email_with_attachment(self, ticket, attachment):
-        subject = "Seu ingresso está pronto! - TicketGo"
+        subject = "Seu ingresso está pronto! - TicketGO"
         message = f"""
-        Olá {ticket.user.username},
-        
-        Segue seu ingresso referente ao evento {ticket.event.name}:
+        <html>
+        <body>
+            <h1>Olá, <strong>{ticket.user.username}</strong>!</h1>
+            
+            <p>Segue seu ingresso referente ao evento <strong>{ticket.event.name}</strong></p>
+
+            <h3><strong>Detalhes do evento:</strong></h3>
+            <ul>
+                <li><strong>Data:</strong> {ticket.event.date}</li>
+                <li><strong>Horário:</strong> {ticket.event.time}</li>
+                <li><strong>Endereço:</strong> {ticket.event.address}</li>
+            </ul>
+            
+            <h3><strong>Detalhes do ingresso:</strong></h3>
+            <ul>
+                <li><strong>ID:</strong> {ticket.uuid}</li>
+                <li><strong>Valor:</strong> R${ticket.purchase.value}</li>
+                <li><strong>Data de compra:</strong> {ticket.purchase.created_at}</li>
+            </ul>
+            
+            <p>Anexado a este email, você encontrará o ingresso com o <strong>código QR</strong> que deverá ser apresentado na entrada do evento.</p>
+            <p>Agradecemos pela sua compra e esperamos que você aproveite o evento!</p>
+
+            <p>Atenciosamente,<br>
+            Equipe <strong>TicketGO!</strong></p>
+        </body>
+        </html>
         """
         email = EmailMessage(
             subject, message, os.getenv("EMAIL_HOST_USER"), [ticket.user.email]
         )
+        email.content_subtype = "html"
         email.attach("ticket_qr.png", attachment.read(), "image/png")
         email.send()
 

@@ -11,45 +11,45 @@ Siga os passos abaixo para configurar e executar o projeto localmente.
 ```
 git clone https://github.com/seu-usuario/ticketgo.git
 cd ticketgo
-````
+```
 
 ### Criar e Ativar um Ambiente Virtual
+
 ```
 python -m venv venv
 source venv/bin/activate  # No Windows, use `venv\Scripts\activate`
 ```
 
 ### Instalar as Dependências
+
 ```
 pip install -r requirements.txt
 ```
 
-### Criar e conectar um banco de dados PostgreSQL 
+### Copiar .env-EXAMPLE to .env
+
+### Alterar .env conforme necessário
+
+### Criar e conectar um banco de dados PostgreSQL
+
 ```
 pip install -r requirements.txt
 ```
 
-### Criar .env com variáveis de ambiente 
-```
-ASAAS_ACCESS_TOKEN
-EMAIL_HOST 
-EMAIL_PORT 
-EMAIL_USE_TLS 
-EMAIL_HOST_USER 
-EMAIL_HOST_PASSWORD 
-```
+## Aplicar migrações
 
-### Aplicar migrações 
 ```
 python manage.py migrate
 ```
 
-### Criar superusuário 
+### Criar superusuário
+
 ```
 python manage.py createsuperuser
 ```
 
 ### Rodar o Servidor de Desenvolvimento
+
 ```
 python manage.py runserver
 ```
