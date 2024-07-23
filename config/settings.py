@@ -45,6 +45,7 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount.providers.google",
     "rest_framework",
     "drf_spectacular",
+    "drf_audit_trail",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -59,6 +60,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # django-allauth
     "allauth.account.middleware.AccountMiddleware",
+    #drf-audit-trail
+    "drf_audit_trail.middleware.RequestLoginAuditEventMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -197,3 +200,8 @@ EMAIL_PORT = (os.getenv("EMAIL_PORT"))
 EMAIL_USE_TLS = (os.getenv("EMAIL_USE_TLS"))
 EMAIL_HOST_USER = (os.getenv("EMAIL_HOST_USER"))
 EMAIL_HOST_PASSWORD = (os.getenv("EMAIL_HOST_PASSWORD"))
+
+
+#drf-audit-trail
+DRF_AUDIT_TRAIL_REQUEST_AUDIT_URLS = [r"^.*?/"]
+DRF_AUDIT_TRAIL_AUTH_URL = "/user/login/"
