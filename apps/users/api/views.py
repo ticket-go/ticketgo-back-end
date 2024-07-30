@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, logout, get_user_model
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import redirect, get_object_or_404
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from rest_framework import generics, status, viewsets
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
@@ -16,36 +17,10 @@ from apps.users.models import CustomUser
 CustomUser = get_user_model()
 
 
-class UserViewSet(
-    RetrieveModelMixin, ListModelMixin, UpdateModelMixin, viewsets.GenericViewSet
-):
-    serializer_class = serializers.CustomUserUpdateSerializer
+class UserViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.CustomUserSerializer
     queryset = CustomUser.objects.all()
     lookup_field = "user_id"
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-
-        new_email = serializer.validated_data.get("email", None)
-
-        if new_email and CustomUser.objects.filter(email=new_email).exists():
-            return Response(
-                {"error": "Este endereço de e-mail já está em uso por outro usuário."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        self.perform_update(serializer)
-
-        return Response(serializer.data)
-
-
-class CustomUserViewSet(generics.CreateAPIView):
-
-    serializer_class = serializers.CustomUserSerializer
-    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -71,7 +46,6 @@ class CustomUserViewSet(generics.CreateAPIView):
                 gender=serializer.validated_data.get("gender"),
                 address=serializer.validated_data.get("address"),
                 privileged=serializer.validated_data.get("privileged"),
-                password=serializer.validated_data.get("password"),
             )
 
             return Response(
@@ -80,6 +54,24 @@ class CustomUserViewSet(generics.CreateAPIView):
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        new_email = serializer.validated_data.get("email", None)
+
+        if new_email and CustomUser.objects.filter(email=new_email).exists():
+            return Response(
+                {"error": "Este endereço de e-mail já está em uso por outro usuário."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
 
 
 class CustomUserChangePasswordViewSet(generics.UpdateAPIView):
@@ -150,6 +142,9 @@ class LoginViewSet(APIView):
 class LogoutViewSet(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=None, responses={200: OpenApiResponse(description="Logout successful")}
+    )
     def post(self, request):
         logout(request)
         return Response(

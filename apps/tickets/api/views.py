@@ -2,6 +2,7 @@ import os
 import qrcode
 from io import BytesIO
 from django.core.mail import EmailMessage
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from config import settings
 from rest_framework import generics, status, viewsets, permissions
@@ -30,11 +31,25 @@ class TicketsViewSet(viewsets.ModelViewSet):
     def get_purchase(self):
         purchase_pk = self.request.data.get("purchase")
         return get_object_or_404(Purchase, uuid=purchase_pk)
-    
+
     def get_queryset(self):
         event_uuid = self.kwargs.get("event_uuid")
         event = get_object_or_404(Event, uuid=event_uuid)
         return Ticket.objects.filter(event=event)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="event_uuid",
+                type=str,
+                description="UUID of the event associated with the tickets",
+                location=OpenApiParameter.PATH,
+            )
+        ],
+        responses={200: TicketSerializer(many=True)},
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         event = self.get_event()

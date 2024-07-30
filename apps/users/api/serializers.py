@@ -6,12 +6,6 @@ from apps.users import models
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CustomUser
-        fields = "__all__"
-
-
-class CustomUserUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.CustomUser
         fields = [
             "username",
             "first_name",
@@ -52,22 +46,3 @@ class CustomUserChangeEmailSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=16)
     password = serializers.CharField(max_length=16)
-
-
-class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.CustomUser
-        fields = [
-            "user_id",
-            "username",
-            "first_name",
-            "last_name",
-            "email",
-            "phone",
-            "cpf",
-            "birthdate",
-            "gender",
-            "privileged",
-            "address",
-            "organization",
-        ]
