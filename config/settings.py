@@ -16,6 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
+    'ticketgo-backend-dev.onrender.com',
 ]
 
 DJANGO_APPS = [
