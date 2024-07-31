@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from apps.events.models import Event
+from drf_spectacular.utils import extend_schema_field
 
 
 class EventsSerializer(serializers.ModelSerializer):
@@ -34,8 +35,10 @@ class EventsSerializer(serializers.ModelSerializer):
     category_display = serializers.SerializerMethodField()
     status_display = serializers.SerializerMethodField()
 
+    @extend_schema_field(serializers.CharField())
     def get_category_display(self, obj):
         return obj.get_category_display()
 
+    @extend_schema_field(serializers.CharField())
     def get_status_display(self, obj):
         return obj.get_status_display()
