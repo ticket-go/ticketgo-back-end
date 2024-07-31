@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, logout, get_user_model
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import redirect, get_object_or_404
+from apps.users.permissions import AllowCreateOnly
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from rest_framework import generics, status, viewsets
@@ -21,39 +22,29 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CustomUserSerializer
     queryset = CustomUser.objects.all()
     lookup_field = "user_id"
+    permission_classes = [AllowCreateOnly]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if serializer.is_valid():
-            email = serializer.validated_data.get("email", None)
-            if email and CustomUser.objects.filter(email=email).exists():
-                return Response(
-                    {
-                        "error": "Este endereço de e-mail já está em uso por outro usuário."
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            user = CustomUser.objects.create_user(
-                username=serializer.validated_data.get("username"),
-                cpf=serializer.validated_data.get("cpf"),
-                email=serializer.validated_data.get("email"),
-                first_name=serializer.validated_data.get("first_name"),
-                last_name=serializer.validated_data.get("last_name"),
-                phone=serializer.validated_data.get("phone"),
-                birthdate=serializer.validated_data.get("birthdate"),
-                gender=serializer.validated_data.get("gender"),
-                address=serializer.validated_data.get("address"),
-                privileged=serializer.validated_data.get("privileged"),
-            )
-
+        email = serializer.validated_data.get("email")
+        if email and CustomUser.objects.filter(email=email).exists():
             return Response(
-                {"TicketGo": f"O usuário {user.username} foi registrado com sucesso."},
-                status=status.HTTP_201_CREATED,
+                {"error": "Este endereço de e-mail já está em uso por outro usuário."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user = CustomUser.objects.create_user(**serializer.validated_data)
+        user.set_password("guest")
+        user.save()
+
+        return Response(
+            {
+                "TicketGo": f"O usuário {user.user_id} - {user.username} foi registrado com sucesso."
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
@@ -61,8 +52,11 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
-        new_email = serializer.validated_data.get("email", None)
+        data = request.data.copy()
+        if "password" in data:
+            data.pop("password")
 
+        new_email = serializer.validated_data.get("email")
         if new_email and CustomUser.objects.filter(email=new_email).exists():
             return Response(
                 {"error": "Este endereço de e-mail já está em uso por outro usuário."},
@@ -70,8 +64,15 @@ class UserViewSet(viewsets.ModelViewSet):
             )
 
         self.perform_update(serializer)
-
         return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(
+            {"message": f"O usuário {instance.username} foi deletado com sucesso."},
+            status=status.HTTP_200_OK,
+        )
 
 
 class CustomUserChangePasswordViewSet(generics.UpdateAPIView):
@@ -79,8 +80,7 @@ class CustomUserChangePasswordViewSet(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        user_id = self.kwargs.get("user_id")
-        return get_object_or_404(get_user_model(), user_id=user_id)
+        return self.request.user
 
     def update(self, request, *args, **kwargs):
         user = self.get_object()
@@ -92,7 +92,7 @@ class CustomUserChangePasswordViewSet(generics.UpdateAPIView):
         old_password = serializer.validated_data.get("old_password")
         new_password = serializer.validated_data.get("new_password")
 
-        if not check_password(old_password, user.password):
+        if not user.check_password(old_password):
             return Response(
                 {"detail": "Senha antiga incorreta."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -114,9 +114,14 @@ class LoginViewSet(APIView):
 
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            username = serializer.validated_data["username"]
-            password = serializer.validated_data["password"]
-            user = authenticate(request, username=username, password=password)
+            username = request.data["username"]
+            password = request.data["password"]
+            user = CustomUser.objects.get(username=username)
+            if user is None:
+                return Response({"response": "No User exist"})
+            if not user.check_password(password):
+                return Response({"response": "incorrect Password"})
+
             if user:
                 try:
                     access_token = RefreshToken.for_user(user)
