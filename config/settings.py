@@ -46,6 +46,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "drf_spectacular",
     "drf_audit_trail",
+    "drf_audit_trail",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -60,7 +61,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # django-allauth
     "allauth.account.middleware.AccountMiddleware",
-    #drf-audit-trail
+    # drf-audit-trail
     "drf_audit_trail.middleware.RequestLoginAuditEventMiddleware",
 ]
 
@@ -69,6 +70,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "apps/templates")],
         "DIRS": [os.path.join(BASE_DIR, "apps/templates")],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -181,7 +183,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "USER_ID_FIELD": "user_id",
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
@@ -193,15 +195,15 @@ SPECTACULAR_SETTINGS = {
 }
 
 
-# django.core.mail 
+# django.core.mail
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = (os.getenv("EMAIL_HOST"))
-EMAIL_PORT = (os.getenv("EMAIL_PORT"))
-EMAIL_USE_TLS = (os.getenv("EMAIL_USE_TLS"))
-EMAIL_HOST_USER = (os.getenv("EMAIL_HOST_USER"))
-EMAIL_HOST_PASSWORD = (os.getenv("EMAIL_HOST_PASSWORD"))
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 
-#drf-audit-trail
+# drf-audit-trail
 DRF_AUDIT_TRAIL_REQUEST_AUDIT_URLS = [r"^.*?/"]
 DRF_AUDIT_TRAIL_AUTH_URL = "/user/login/"

@@ -14,6 +14,7 @@ from apps.financial.asaas import AssasPaymentClient
 from apps.financial.models import Payment, Purchase
 
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
 
@@ -40,10 +41,12 @@ class PaymentsViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class InvoicesAPIView(APIView):
+class InvoicesAPIView(GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @extend_schema(request=ListPaymentsSerializer)
+    @extend_schema(
+        request=ListPaymentsSerializer, responses={200: ListPaymentsSerializer}
+    )
     def get(self, request):
         serializer = ListPaymentsSerializer(data=request.query_params)
         if serializer.is_valid():
@@ -52,7 +55,9 @@ class InvoicesAPIView(APIView):
             return Response(payments, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(request=CreateInvoiceSerializer)
+    @extend_schema(
+        request=CreateInvoiceSerializer, responses={200: CreateInvoiceSerializer}
+    )
     def post(self, request):
         serializer = CreateInvoiceSerializer(data=request.data)
         if serializer.is_valid():

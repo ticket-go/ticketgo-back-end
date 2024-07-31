@@ -4,27 +4,25 @@ from apps.users import models
 
 # Dados do usuário
 class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.CustomUser
-        fields = "__all__"
+    password = serializers.CharField(write_only=True, required=False)
 
-
-class CustomUserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CustomUser
         fields = [
+            "user_id",
             "username",
             "first_name",
             "last_name",
             "phone",
+            "cpf",
             "email",
             "gender",
             "privileged",
             "address",
             "organization",
+            "password",
         ]
-
-        extra_kwargs = {field: {"required": False} for field in fields}
+        read_only_fields = ["user_id"]
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
@@ -39,9 +37,17 @@ class CustomUserChangePasswordSerializer(serializers.Serializer):
     confirm_new_password = serializers.CharField(required=True)
 
     def validate(self, data):
-
-        if data["new_password"] != data["confirm_new_password"]:
-            raise serializers.ValidationError("Senhas diferentes. Tente novamente.")
+        user = self.context["request"].user
+        if not user.check_password(data.get("old_password")):
+            print(f"Senha antiga fornecida: {data.get('old_password')}")
+            print(f"Senha atual do usuário: {user.password}")
+            raise serializers.ValidationError(
+                {"old_password": "Senha antiga incorreta."}
+            )
+        if data.get("new_password") != data.get("confirm_new_password"):
+            raise serializers.ValidationError(
+                {"new_password": "As novas senhas não coincidem."}
+            )
         return data
 
 
@@ -52,22 +58,3 @@ class CustomUserChangeEmailSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=16)
     password = serializers.CharField(max_length=16)
-
-
-class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.CustomUser
-        fields = [
-            "user_id",
-            "username",
-            "first_name",
-            "last_name",
-            "email",
-            "phone",
-            "cpf",
-            "birthdate",
-            "gender",
-            "privileged",
-            "address",
-            "organization",
-        ]
