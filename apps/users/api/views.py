@@ -52,9 +52,11 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
-        data = request.data.copy()
-        if "password" in data:
-            data.pop("password")
+        if "password" in serializer.validated_data:
+            return Response(
+                {"error": "A alteração da senha não é permitida."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         new_email = serializer.validated_data.get("email")
         if new_email and CustomUser.objects.filter(email=new_email).exists():
