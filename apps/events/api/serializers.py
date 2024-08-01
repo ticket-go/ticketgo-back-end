@@ -1,6 +1,17 @@
+from apps.address.api.serializers import AddressSerializer
+from apps.organizations.models import Organization
+from apps.users.api.serializers import CustomUserSerializer
 from rest_framework import serializers
 from apps.events.models import Event
 from drf_spectacular.utils import extend_schema_field
+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    user_organization = CustomUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Organization
+        fields = ["uuid", "name", "cnpj", "user_organization"]
 
 
 class EventsSerializer(serializers.ModelSerializer):
@@ -29,6 +40,8 @@ class EventsSerializer(serializers.ModelSerializer):
             "organization",
         ]
 
+    address = AddressSerializer()
+    organization = OrganizationSerializer()
     tickets_sold = serializers.IntegerField(read_only=True)
     tickets_available = serializers.IntegerField(read_only=True)
     half_tickets_available = serializers.IntegerField(read_only=True)
