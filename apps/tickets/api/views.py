@@ -22,7 +22,7 @@ class TicketsViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     lookup_field = "uuid"
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     def get_event(self):
         event_pk = self.kwargs.get("event_uuid")
@@ -200,7 +200,7 @@ class TicketsViewSet(viewsets.ModelViewSet):
 
 class VerifyTicketViewSet(generics.UpdateAPIView):
     serializer_class = VerifyTicketSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
         event_uuid = kwargs.get("event_uuid")

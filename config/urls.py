@@ -9,8 +9,20 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from drf_spectacular.utils import extend_schema_view, extend_schema
 
 
+# temporary
+from rest_framework.permissions import AllowAny
+from drf_spectacular.views import SpectacularSwaggerView
+
+
+# temporary
+class PublicSpectacularSwaggerView(SpectacularSwaggerView):
+    permission_classes = [AllowAny]
+    pass
+
+
 @extend_schema_view(get=extend_schema(exclude=True))
 class CustomSpectacularAPIView(SpectacularAPIView):
+    permission_classes = [AllowAny]
     pass
 
 
@@ -25,7 +37,8 @@ urlpatterns += [
     path("api/schema/", CustomSpectacularAPIView.as_view(), name="api-schema"),
     path(
         "api/docs/",
-        SpectacularSwaggerView.as_view(url_name="api-schema"),
+        # SpectacularSwaggerView.as_view(url_name="api-schema"), temporary
+        PublicSpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
 ]
