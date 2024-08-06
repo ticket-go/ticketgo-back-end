@@ -1,13 +1,12 @@
+from uuid import uuid4
 from datetime import date
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
 from django.utils.translation import gettext as _
-
 from django.core.validators import MaxValueValidator
 
-from uuid import uuid4
+from simple_history.models import HistoricalRecords
 
 from apps.utils.cpf_cnpj.models import CPFField
 
@@ -43,6 +42,7 @@ class CustomUser(AbstractUser):
         null=True,
         blank=True,
     )
+    history = HistoricalRecords()
 
     def get_user_id(self):
         return self.user_id

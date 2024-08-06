@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext as _
 
+from simple_history.models import HistoricalRecords
+
 from apps.core.models import BaseModel
 from apps.users.models import CustomUser
 
@@ -21,6 +23,7 @@ class Purchase(BaseModel):
         verbose_name=_("Status"),
     )
     user = models.ForeignKey(CustomUser, on_delete=models.DO_NOTHING)
+    history = HistoricalRecords()
 
     def __str__(self) -> str:
         return self.user.username + " - " + str(self.value)
@@ -59,3 +62,4 @@ class Payment(BaseModel):
         max_length=500, verbose_name=_("Link do pagamento"), null=True, blank=True
     )
     purchase = models.OneToOneField(Purchase, on_delete=models.CASCADE)
+    history = HistoricalRecords()
