@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from drf_spectacular.utils import extend_schema
 
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+
+
 from apps.financial.api.serializers import (
     CreateInvoiceSerializer,
     ListPaymentsSerializer,
@@ -30,6 +34,40 @@ class PurchasesViewSet(viewsets.ModelViewSet):
     lookup_field = "uuid"
     # permission_classes = [permissions.IsAuthenticated]
 
+    @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated])
+    def history(self, request, uuid=None):
+        purchase = self.get_object()
+        history = purchase.history.all()
+
+        history_data = []
+        for entry in history:
+            if entry.prev_record:
+                diff = entry.diff_against(entry.prev_record)
+                changes = []
+                for change in diff.changes:
+                    field = Purchase._meta.get_field(change.field)
+                    verbose_name = field.verbose_name
+                    changes.append(
+                        {
+                            "field": verbose_name,
+                            "old_value": change.old,
+                            "new_value": change.new,
+                        }
+                    )
+            else:
+                changes = "Initial creation"
+
+            history_data.append(
+                {
+                    "history_id": entry.history_id,
+                    "history_date": entry.history_date,
+                    "history_change_reason": entry.history_change_reason,
+                    "changes": changes,
+                }
+            )
+
+        return Response(history_data)
+
 
 class PaymentsViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
@@ -39,6 +77,40 @@ class PaymentsViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated])
+    def history(self, request, uuid=None):
+        payment = self.get_object()
+        history = payment.history.all()
+
+        history_data = []
+        for entry in history:
+            if entry.prev_record:
+                diff = entry.diff_against(entry.prev_record)
+                changes = []
+                for change in diff.changes:
+                    field = Payment._meta.get_field(change.field)
+                    verbose_name = field.verbose_name
+                    changes.append(
+                        {
+                            "field": verbose_name,
+                            "old_value": change.old,
+                            "new_value": change.new,
+                        }
+                    )
+            else:
+                changes = "Initial creation"
+
+            history_data.append(
+                {
+                    "history_id": entry.history_id,
+                    "history_date": entry.history_date,
+                    "history_change_reason": entry.history_change_reason,
+                    "changes": changes,
+                }
+            )
+
+        return Response(history_data)
 
 
 class InvoicesAPIView(GenericAPIView):

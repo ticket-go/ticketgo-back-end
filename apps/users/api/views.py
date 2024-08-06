@@ -1,14 +1,13 @@
-from django.contrib.auth import authenticate, logout, get_user_model
-from django.contrib.auth.hashers import check_password
-from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth import logout, get_user_model
+from django.shortcuts import redirect
 from apps.users.permissions import AllowCreateOnly
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from rest_framework import generics, status, viewsets
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
@@ -75,6 +74,40 @@ class UserViewSet(viewsets.ModelViewSet):
             {"message": f"O usuário {instance.username} foi deletado com sucesso."},
             status=status.HTTP_200_OK,
         )
+
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    def history(self, request):
+        user = request.user
+        history = user.history.all()
+
+        history_data = []
+        for entry in history:
+            if entry.prev_record:
+                diff = entry.diff_against(entry.prev_record)
+                changes = []
+                for change in diff.changes:
+                    field = CustomUser._meta.get_field(change.field)
+                    verbose_name = field.verbose_name
+                    changes.append(
+                        {
+                            "field": verbose_name,
+                            "old_value": change.old,
+                            "new_value": change.new,
+                        }
+                    )
+            else:
+                changes = "Initial creation"
+
+            history_data.append(
+                {
+                    "history_id": entry.history_id,
+                    "history_date": entry.history_date,
+                    "history_change_reason": entry.history_change_reason,
+                    "changes": changes,
+                }
+            )
+
+        return Response(history_data)
 
 
 class CustomUserChangePasswordViewSet(generics.UpdateAPIView):
