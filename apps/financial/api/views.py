@@ -115,6 +115,7 @@ class PaymentsViewSet(viewsets.ModelViewSet):
 
 class InvoicesAPIView(GenericAPIView):
     # permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
         request=ListPaymentsSerializer, responses={200: ListPaymentsSerializer}
