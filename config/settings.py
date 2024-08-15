@@ -19,6 +19,13 @@ ALLOWED_HOSTS = [
     "ticketgo-backend-dev.onrender.com",
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://ticketgo-front-end-dev.onrender.com",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -47,6 +54,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "drf_spectacular",
     "simple_history",
+    "corsheaders",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -56,6 +64,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
