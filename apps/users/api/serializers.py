@@ -4,7 +4,7 @@ from apps.users import models
 
 # Dados do usuário
 class CustomUserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = models.CustomUser
@@ -14,6 +14,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "phone",
+            "birthdate",
             "cpf",
             "email",
             "gender",
@@ -23,6 +24,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "password",
         ]
         read_only_fields = ["user_id"]
+
+    def create(self, validated_data):
+        password = validated_data.pop("password", None)
+        user = super().create(validated_data)
+        if password:
+            user.set_password(password)
+        user.save()
+        return user
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():

@@ -12,17 +12,20 @@ from apps.utils.cpf_cnpj.models import CPFField
 
 
 class CustomUser(AbstractUser):
+    GENDER_CHOICES = (("M", _("Homem")), ("F", _("Mulher")), ("O", _("Outro")))
+
     user_id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    phone = models.CharField(max_length=12, verbose_name=_("Telefone"))
+    phone = models.CharField(max_length=12, verbose_name=_("Telefone"), null=True)
     cpf = CPFField(verbose_name=_("CPF"))
     birthdate = models.DateField(
-        null=True,
         validators=[MaxValueValidator(limit_value=date.today)],
         verbose_name=_("Data de Nascimento"),
+        default=date(2000, 1, 1)
     )
     gender = models.CharField(
         max_length=1,
-        choices=[("M", "Homem"), ("F", "Mulher"), ("O", "Outro")],
+        choices=GENDER_CHOICES,
+        null=True,
         blank=True,
         verbose_name=_("Gênero"),
     )
