@@ -1,3 +1,5 @@
+from apps.address.models import Address
+from apps.organizations.models import Organization
 from rest_framework import serializers
 from apps.users import models
 
@@ -5,6 +7,12 @@ from apps.users import models
 # Dados do usuário
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    address = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Address, required=False
+    )
+    organization = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Organization, required=False
+    )
 
     class Meta:
         model = models.CustomUser
