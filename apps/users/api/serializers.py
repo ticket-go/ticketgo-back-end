@@ -8,10 +8,10 @@ from apps.users import models
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     address = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Address.objects.all(), required=False
+        queryset=Address.objects.all(), required=False
     )
     organization = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Organization.objects.all(), required=False
+        queryset=Organization.objects.all(), required=False
     )
 
     class Meta:
