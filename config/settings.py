@@ -21,7 +21,7 @@ ALLOWED_HOSTS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://ticketgo-front-end-dev.onrender.com",
+    "https://ticketgo-frontend-dev.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
