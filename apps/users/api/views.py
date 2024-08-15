@@ -27,6 +27,13 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        username = serializer.validated_data.get("username")
+        if username and CustomUser.objects.filter(username=username).exists():
+            return Response(
+                {"error": "Este usuário já está em uso por outro usuário."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
         email = serializer.validated_data.get("email")
         if email and CustomUser.objects.filter(email=email).exists():
             return Response(
@@ -34,9 +41,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user = CustomUser.objects.create_user(**serializer.validated_data)
-        user.set_password("guest")
-        user.save()
+        user = serializer.save()
 
         return Response(
             {
