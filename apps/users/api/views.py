@@ -33,7 +33,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 {"error": "Este usuário já está em uso por outro usuário."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         email = serializer.validated_data.get("email")
         if email and CustomUser.objects.filter(email=email).exists():
             return Response(
@@ -160,22 +160,19 @@ class LoginViewSet(APIView):
                 user = CustomUser.objects.get(username=username)
             except CustomUser.DoesNotExist:
                 return Response(
-                    {"error": "User does not exist"}, 
-                    status=status.HTTP_404_NOT_FOUND
+                    {"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
                 )
 
             if not user.check_password(password):
                 return Response(
-                    {"error": "Incorrect password"},
-                    status=status.HTTP_401_UNAUTHORIZED
+                    {"error": "Incorrect password"}, status=status.HTTP_401_UNAUTHORIZED
                 )
 
             try:
                 access_token = RefreshToken.for_user(user)
             except TokenError as e:
                 return Response(
-                    {"error": str(e)}, 
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
             user_data = serializers.CustomUserSerializer(user).data
@@ -184,11 +181,12 @@ class LoginViewSet(APIView):
                 {
                     "access_token": str(access_token.access_token),
                     "refresh_token": str(access_token),
-                    "user": user_data
+                    "user": user_data,
                 },
-                status=status.HTTP_200_OK
+                status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class LogoutViewSet(APIView):
     permission_classes = [IsAuthenticated]
@@ -197,6 +195,11 @@ class LogoutViewSet(APIView):
         request=None, responses={200: OpenApiResponse(description="Logout successful")}
     )
     def post(self, request):
+        if not request.user.is_authenticated:
+            return Response(
+                {"message": "Usuário não autenticado."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         logout(request)
         return Response(
             {"message": "Você foi desconectado com sucesso."}, status=status.HTTP_200_OK
