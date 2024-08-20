@@ -117,3 +117,7 @@ class Event(BaseModel):
     @property
     def half_tickets_sold(self):
         return self.half_ticket_quantity - self.half_tickets_available
+
+    @property
+    def tickets_verified(self):
+        return self.linked_event.filter(verified=True).count()
