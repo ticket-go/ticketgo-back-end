@@ -36,6 +36,7 @@ class EventsSerializer(serializers.ModelSerializer):
             "tickets_sold",
             "tickets_available",
             "half_tickets_available",
+            "tickets_verified",
             "address",
             "organization",
         ]
@@ -45,6 +46,7 @@ class EventsSerializer(serializers.ModelSerializer):
     tickets_sold = serializers.IntegerField(read_only=True)
     tickets_available = serializers.IntegerField(read_only=True)
     half_tickets_available = serializers.IntegerField(read_only=True)
+    tickets_verified = serializers.IntegerField(read_only=True)
     category_display = serializers.SerializerMethodField()
     status_display = serializers.SerializerMethodField()
 
