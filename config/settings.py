@@ -44,7 +44,6 @@ LOCAL_APPS = [
     "apps.address",
     "apps.events",
     "apps.tickets",
-    "apps.organizations",
     "apps.financial",
 ]
 

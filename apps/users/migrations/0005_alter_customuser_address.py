@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('address', '0002_add_updated_by_and_more'),
-        ('users', '0005_historicalcustomuser'),
+        ('users', '0004_historicalcustomuser'),
     ]
 
     operations = [

@@ -3,8 +3,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from apps.address.models import Address
-from apps.organizations.models import Organization
-from apps.core.models import BaseModel
+from apps.core.models import BaseModel, CustomUser
 
 
 class Event(BaseModel):
@@ -79,15 +78,25 @@ class Event(BaseModel):
         null=True,
         verbose_name=_("Quantidade de ingressos disponíveis do tipo meia-entrada"),
     )
+    is_top_event = models.BooleanField(
+        default=False,
+        blank=True,
+        verbose_name=_("Evento em destaque"),
+    )
+    is_hero_event = models.BooleanField(
+        default=False,
+        blank=True,
+        verbose_name=_("Evento em destaque principal na Hero Section"),
+    )
     address = models.ForeignKey(
         Address,
         related_name="event_address",
         on_delete=models.CASCADE,
         verbose_name=_("Endereço"),
     )
-    organization = models.ForeignKey(
-        Organization,
-        verbose_name=_("Organização"),
+    user = models.ForeignKey(
+        CustomUser,
+        verbose_name=_("Organizador"),
         related_name="event_organization",
         on_delete=models.CASCADE,
         null=True,
