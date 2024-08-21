@@ -54,6 +54,12 @@ python manage.py loaddata initial_data.json
 python manage.py createsuperuser
 ```
 
+### Fazer backup do banco de dados
+
+```
+python manage.py backupdb
+```
+
 ### Rodar o Servidor de Desenvolvimento
 
 ```
