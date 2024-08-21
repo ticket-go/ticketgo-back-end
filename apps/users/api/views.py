@@ -24,7 +24,9 @@ class UserViewSet(viewsets.ModelViewSet):
     # permission_classes = [AllowCreateOnly]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(
+            data=request.data, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
 
         username = serializer.validated_data.get("username")
@@ -53,7 +55,9 @@ class UserViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
 
         if "password" in serializer.validated_data:

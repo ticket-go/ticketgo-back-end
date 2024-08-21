@@ -1,17 +1,14 @@
+from apps.address.api.serializers import AddressSerializer
 from apps.address.models import Address
-from apps.organizations.models import Organization
 from rest_framework import serializers
 from apps.users import models
 
 
-# Dados do usuário
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    address = serializers.PrimaryKeyRelatedField(
+    address = AddressSerializer(read_only=True)
+    address_id = serializers.PrimaryKeyRelatedField(
         queryset=Address.objects.all(), required=False
-    )
-    organization = serializers.PrimaryKeyRelatedField(
-        queryset=Organization.objects.all(), required=False
     )
 
     class Meta:
@@ -28,22 +25,42 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "gender",
             "privileged",
             "address",
-            "organization",
+            "address_id",
             "password",
         ]
         read_only_fields = ["user_id"]
 
+    def __init__(self, *args, **kwargs):
+        context = kwargs.get("context", {})
+        request = context.get("request", None)
+        super().__init__(*args, **kwargs)
+        if request and request.method in ["POST"]:
+            self.fields["username"].required = True
+            self.fields["cpf"].required = True
+            self.fields["password"].required = True
+        else:
+            self.fields["username"].required = False
+            self.fields["cpf"].required = False
+            self.fields["password"].required = False
+
     def create(self, validated_data):
         password = validated_data.pop("password", None)
+        address_data = validated_data.pop("address_id", None)
+
         user = super().create(validated_data)
         if password:
             user.set_password(password)
+        if address_data:
+            user.user_address = address_data
         user.save()
         return user
 
     def update(self, instance, validated_data):
+        adress_data = validated_data.pop("address_id", None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+        if adress_data is not None:
+            instance.user_address = adress_data
         instance.save()
         return instance
 
