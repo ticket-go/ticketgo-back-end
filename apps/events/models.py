@@ -78,6 +78,16 @@ class Event(BaseModel):
         null=True,
         verbose_name=_("Quantidade de ingressos disponíveis do tipo meia-entrada"),
     )
+    is_top_event = models.BooleanField(
+        default=False,
+        blank=True,
+        verbose_name=_("Evento em destaque"),
+    )
+    is_hero_event = models.BooleanField(
+        default=False,
+        blank=True,
+        verbose_name=_("Evento em destaque principal na Hero Section"),
+    )
     address = models.ForeignKey(
         Address,
         related_name="event_address",

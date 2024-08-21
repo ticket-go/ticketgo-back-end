@@ -50,6 +50,8 @@ class EventsSerializer(serializers.ModelSerializer):
             "tickets_available",
             "half_tickets_available",
             "tickets_verified",
+            "is_top_event",
+            "is_hero_event",
             "address",
             "address_id",
             "user",
@@ -81,6 +83,7 @@ class EventsSerializer(serializers.ModelSerializer):
             self.fields["name"].required = False
             self.fields["date"].required = False
             self.fields["time"].required = False
+            self.fields["description"].required = False
             self.fields["category"].required = False
             self.fields["status"].required = False
             self.fields["image"].required = False
