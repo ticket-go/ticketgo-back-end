@@ -3,8 +3,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from apps.address.models import Address
-from apps.organizations.models import Organization
-from apps.core.models import BaseModel
+from apps.core.models import BaseModel, CustomUser
 
 
 class Event(BaseModel):
@@ -85,9 +84,9 @@ class Event(BaseModel):
         on_delete=models.CASCADE,
         verbose_name=_("Endereço"),
     )
-    organization = models.ForeignKey(
-        Organization,
-        verbose_name=_("Organização"),
+    user = models.ForeignKey(
+        CustomUser,
+        verbose_name=_("Organizador"),
         related_name="event_organization",
         on_delete=models.CASCADE,
         null=True,

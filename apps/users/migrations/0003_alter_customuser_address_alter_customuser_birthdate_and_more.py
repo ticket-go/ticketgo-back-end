@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('address', '0002_add_updated_by_and_more'),
-        ('users', '0003_customuser_birthdate_alter_customuser_cpf'),
+        ('users', '0002_customuser_birthdate_alter_customuser_cpf'),
     ]
 
     operations = [

@@ -58,7 +58,7 @@ class AsaasCustomerSerializer(serializers.Serializer):
     cpfCnpj = serializers.CharField(source="cpf")
     email = serializers.EmailField()
     phone = serializers.CharField()
-    address = serializers.CharField(source="address.street")
+    address = serializers.SerializerMethodField()
     addressNumber = serializers.CharField(source="address.number")
     complement = serializers.CharField(source="address.complement")
     province = serializers.CharField(source="address.district")
@@ -66,3 +66,8 @@ class AsaasCustomerSerializer(serializers.Serializer):
 
     def get_name(self, obj):
         return obj.get_full_name()
+
+    def get_address(self, obj):
+        if obj.address:
+            return obj.address.street
+        raise serializers.ValidationError({"error": "Endereço não cadastrado para o usuário."})

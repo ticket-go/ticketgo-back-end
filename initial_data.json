@@ -57,7 +57,6 @@
     }
   },
   {
-    "model": "organizations.organization",
     "pk": 2,
     "fields": {
       "uuid": "c2e9a161-da8d-40b3-844b-d806cc608f4c",
@@ -70,7 +69,6 @@
     }
   },
   {
-    "model": "organizations.organization",
     "pk": 3,
     "fields": {
       "uuid": "fde5f9b3-251e-458d-ad6f-43b46eed9b75",
@@ -83,7 +81,6 @@
     }
   },
   {
-    "model": "organizations.organization",
     "pk": 4,
     "fields": {
       "uuid": "80e028d0-12f5-441a-9b67-fce8247043fe",
@@ -118,8 +115,7 @@
       "tickets_sold": 0,
       "tickets_available": 500,
       "half_tickets_available": 250,
-      "address": 3,
-      "organization": 2
+      "address": 3
     }
   },
   {
@@ -145,8 +141,7 @@
       "tickets_sold": 0,
       "tickets_available": 500,
       "half_tickets_available": 250,
-      "address": 3,
-      "organization": 2
+      "address": 3
     }
   },
   {
@@ -172,8 +167,7 @@
       "tickets_sold": 0,
       "tickets_available": 1000,
       "half_tickets_available": 300,
-      "address": 4,
-      "organization": 3
+      "address": 4
     }
   },
   {
@@ -199,8 +193,7 @@
       "tickets_sold": 0,
       "tickets_available": 300,
       "half_tickets_available": 50,
-      "address": 5,
-      "organization": 4
+      "address": 5
     }
   }
 ]

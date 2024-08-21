@@ -8,7 +8,7 @@ from django.core.validators import MaxValueValidator
 
 from simple_history.models import HistoricalRecords
 
-from apps.utils.cpf_cnpj.models import CPFField
+from apps.utils.cpf_cnpj.models import CNPJField, CPFField
 
 
 class CustomUser(AbstractUser):
@@ -17,10 +17,11 @@ class CustomUser(AbstractUser):
     user_id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     phone = models.CharField(max_length=12, verbose_name=_("Telefone"), null=True)
     cpf = CPFField(verbose_name=_("CPF"))
+    cnpj = CNPJField(null=True, blank=True, verbose_name=_("CNPJ"))
     birthdate = models.DateField(
         validators=[MaxValueValidator(limit_value=date.today)],
         verbose_name=_("Data de Nascimento"),
-        default=date(2000, 1, 1)
+        default=date(2000, 1, 1),
     )
     gender = models.CharField(
         max_length=1,
@@ -36,14 +37,6 @@ class CustomUser(AbstractUser):
         on_delete=models.CASCADE,
         null=True,
         verbose_name=_("Endereço"),
-    )
-    organization = models.ForeignKey(
-        "organizations.Organization",
-        verbose_name=_("Organização"),
-        related_name="user_organization",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
     )
     history = HistoricalRecords()
 
