@@ -1,3 +1,4 @@
+from apps.users.api.serializers import CustomUserSerializer
 from rest_framework import serializers
 from apps.financial.models import Payment, Purchase
 from apps.tickets.api.serializers import TicketSerializer
@@ -7,9 +8,13 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Purchase
-        fields = ["uuid", "value", "status", "user", "tickets"]
+        fields = ["uuid", "value", "status", "user", "user_data", "tickets"]
 
     tickets = TicketSerializer(many=True, read_only=True)
+    user_data = serializers.SerializerMethodField(read_only=True)
+
+    def get_user_data(self, obj):
+        return CustomUserSerializer(obj.user).data
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -70,4 +75,6 @@ class AsaasCustomerSerializer(serializers.Serializer):
     def get_address(self, obj):
         if obj.address:
             return obj.address.street
-        raise serializers.ValidationError({"error": "Endereço não cadastrado para o usuário."})
+        raise serializers.ValidationError(
+            {"error": "Endereço não cadastrado para o usuário."}
+        )
