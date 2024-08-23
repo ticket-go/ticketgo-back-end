@@ -28,13 +28,18 @@ class PaymentSerializer(serializers.ModelSerializer):
             "status",
             "link_payment",
             "purchase",
+            "purchase_data",
         ]
 
     external_id = serializers.CharField(read_only=True)
     link_payment = serializers.CharField(read_only=True)
     payment_type = serializers.CharField(read_only=True)
     purchase = serializers.CharField(source="purchase.uuid")
+    purchase_data = serializers.SerializerMethodField(read_only=True)
 
+    def get_purchase_data(self, obj):
+        return PurchaseSerializer(obj.purchase).data
+    
     def create(self, validated_data):
         purchase_uuid = validated_data.pop("purchase")
         purchase = Purchase.objects.get(uuid=purchase_uuid["uuid"])
