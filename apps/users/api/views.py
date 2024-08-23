@@ -21,7 +21,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CustomUserSerializer
     queryset = CustomUser.objects.all()
     lookup_field = "user_id"
-    # permission_classes = [AllowCreateOnly]
+    permission_classes = [AllowCreateOnly]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(
