@@ -17,6 +17,16 @@ from apps.financial.models import Purchase
 from apps.tickets.api.serializers import TicketSerializer, VerifyTicketSerializer
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="event_uuid",
+            type=str,
+            description="UUID of the event",
+            location=OpenApiParameter.PATH,
+        ),
+    ]
+)
 class TicketsViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer

@@ -2,6 +2,7 @@ from apps.users.api.serializers import CustomUserSerializer
 from rest_framework import serializers
 from apps.financial.models import Payment, Purchase
 from apps.tickets.api.serializers import TicketSerializer
+from drf_spectacular.utils import extend_schema_field
 
 
 class PurchaseSerializer(serializers.ModelSerializer):
@@ -13,6 +14,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
     tickets = TicketSerializer(many=True, read_only=True)
     user_data = serializers.SerializerMethodField(read_only=True)
 
+    @extend_schema_field(CustomUserSerializer)
     def get_user_data(self, obj):
         return CustomUserSerializer(obj.user).data
 
@@ -37,6 +39,7 @@ class PaymentSerializer(serializers.ModelSerializer):
     purchase = serializers.CharField(source="purchase.uuid")
     purchase_data = serializers.SerializerMethodField(read_only=True)
 
+    @extend_schema_field(PurchaseSerializer)
     def get_purchase_data(self, obj):
         return PurchaseSerializer(obj.purchase).data
     
