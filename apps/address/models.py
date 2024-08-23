@@ -47,7 +47,7 @@ class Address(BaseModel):
     country = models.CharField(max_length=255, null=False, verbose_name=_("País"))
     zip_code = models.CharField(max_length=9, null=False, verbose_name=_("CEP"))
     complement = models.CharField(
-        max_length=255, blank=True, verbose_name=_("Complemento")
+        max_length=255, null=True, blank=True, verbose_name=_("Complemento")
     )
 
     class Meta:

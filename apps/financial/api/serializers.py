@@ -2,6 +2,7 @@ from apps.users.api.serializers import CustomUserSerializer
 from rest_framework import serializers
 from apps.financial.models import Payment, Purchase
 from apps.tickets.api.serializers import TicketSerializer
+from drf_spectacular.utils import extend_schema_field
 
 
 class PurchaseSerializer(serializers.ModelSerializer):
@@ -13,6 +14,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
     tickets = TicketSerializer(many=True, read_only=True)
     user_data = serializers.SerializerMethodField(read_only=True)
 
+    @extend_schema_field(CustomUserSerializer)
     def get_user_data(self, obj):
         return CustomUserSerializer(obj.user).data
 
@@ -28,13 +30,19 @@ class PaymentSerializer(serializers.ModelSerializer):
             "status",
             "link_payment",
             "purchase",
+            "purchase_data",
         ]
 
     external_id = serializers.CharField(read_only=True)
     link_payment = serializers.CharField(read_only=True)
     payment_type = serializers.CharField(read_only=True)
     purchase = serializers.CharField(source="purchase.uuid")
+    purchase_data = serializers.SerializerMethodField(read_only=True)
 
+    @extend_schema_field(PurchaseSerializer)
+    def get_purchase_data(self, obj):
+        return PurchaseSerializer(obj.purchase).data
+    
     def create(self, validated_data):
         purchase_uuid = validated_data.pop("purchase")
         purchase = Purchase.objects.get(uuid=purchase_uuid["uuid"])

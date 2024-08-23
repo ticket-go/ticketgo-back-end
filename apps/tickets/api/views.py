@@ -4,7 +4,6 @@ from io import BytesIO
 from django.core.mail import EmailMessage
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 
-from config import settings
 from rest_framework import generics, status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -18,11 +17,21 @@ from apps.financial.models import Purchase
 from apps.tickets.api.serializers import TicketSerializer, VerifyTicketSerializer
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="event_uuid",
+            type=str,
+            description="UUID of the event",
+            location=OpenApiParameter.PATH,
+        ),
+    ]
+)
 class TicketsViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     lookup_field = "uuid"
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_event(self):
         event_pk = self.kwargs.get("event_uuid")
@@ -200,7 +209,7 @@ class TicketsViewSet(viewsets.ModelViewSet):
 
 class VerifyTicketViewSet(generics.UpdateAPIView):
     serializer_class = VerifyTicketSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
         event_uuid = kwargs.get("event_uuid")
