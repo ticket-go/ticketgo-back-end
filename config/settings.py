@@ -17,14 +17,16 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     "ticketgo-backend-dev.onrender.com",
-    "10.0.2.2",
+    "10.0.2.2",  # IP do emulador Android
+    env("IP_LOCAL"),  # IP local da sua máquina
 ]
 
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://ticketgo-frontend-dev.onrender.com",
-    "http://10.0.2.2:8000",
+    "http://10.0.2.2:8000",  # IP do emulador Android
+    f"http://{env("IP_LOCAL")}:8000",  # IP local da sua máquina
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -196,6 +198,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
