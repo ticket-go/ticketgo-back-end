@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from .api_router import urlpatterns
@@ -41,4 +43,4 @@ urlpatterns += [
         PublicSpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
