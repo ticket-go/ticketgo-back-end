@@ -26,7 +26,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://ticketgo-frontend-dev.onrender.com",
     "http://10.0.2.2:8000",  # IP do emulador Android
-    f"http://{env("IP_LOCAL")}:8000",  # IP local da sua máquina
+    f"http://{env('IP_LOCAL')}:8000",  # IP local da sua máquina
 ]
 
 CORS_ALLOW_CREDENTIALS = True
