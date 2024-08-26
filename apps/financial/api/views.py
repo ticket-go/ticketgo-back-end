@@ -1,5 +1,6 @@
 import os
 
+from apps.financial.filter import CartPaymentFilter
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from drf_spectacular.utils import extend_schema
@@ -31,10 +32,11 @@ class CartPaymentsViewSet(viewsets.ModelViewSet):
     serializer_class = CartPaymentSerializer
     lookup_field = "uuid"
     permission_classes = [permissions.IsAuthenticated]
+    filterset_class = CartPaymentFilter
 
     def get_serializer_context(self):
-        return {'request': self.request}
-    
+        return {"request": self.request}
+
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
