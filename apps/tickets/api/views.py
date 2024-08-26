@@ -2,6 +2,7 @@ import os
 import qrcode
 from io import BytesIO
 from django.core.mail import EmailMessage
+from apps.financial.models import CartPayment
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from rest_framework import generics, status, viewsets, permissions
@@ -13,7 +14,6 @@ from django.shortcuts import get_object_or_404
 
 from apps.events.models import Event
 from apps.tickets.models import Ticket
-from apps.financial.models import Purchase
 from apps.tickets.api.serializers import TicketSerializer, VerifyTicketSerializer
 
 
@@ -37,9 +37,9 @@ class TicketsViewSet(viewsets.ModelViewSet):
         event_pk = self.kwargs.get("event_uuid")
         return get_object_or_404(Event, uuid=event_pk)
 
-    def get_purchase(self):
-        purchase_pk = self.request.data.get("purchase")
-        return get_object_or_404(Purchase, uuid=purchase_pk)
+    def get_payment(self):
+        payment_pk = self.request.data.get("cart_payment")
+        return get_object_or_404(CartPayment, uuid=payment_pk)
 
     def get_queryset(self):
         event_uuid = self.kwargs.get("event_uuid")
@@ -91,16 +91,16 @@ class TicketsViewSet(viewsets.ModelViewSet):
             message = "Não há meia entrada disponível para este evento."
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
-        purchase = self.get_purchase()
-        # Update the purchase value
+        payment = self.get_payment()
+        # Update the payment value
         half_ticket = serializer.validated_data.get("half_ticket", False)
         ticket_value = event.half_ticket_value if half_ticket else event.ticket_value
-        purchase.value += ticket_value
-        purchase.save()
+        payment.value += ticket_value
+        payment.save()
 
         serializer.validated_data["event"] = event
         serializer.validated_data["user"] = request.user
-        serializer.validated_data["purchase"] = purchase
+        serializer.validated_data["cart_payment"] = payment
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 
@@ -123,15 +123,15 @@ class TicketsViewSet(viewsets.ModelViewSet):
         event.tickets_sold -= 1
         event.save()
 
-        # Update the purchase value
-        purchase = instance.purchase
+        # Update the payment value
+        payment = instance.payment
         ticket_value = (
             instance.event.half_ticket_value
             if instance.half_ticket
             else instance.event.ticket_value
         )
-        purchase.value -= ticket_value
-        purchase.save()
+        payment.value -= ticket_value
+        payment.save()
 
         self.perform_destroy(instance)
 
@@ -187,8 +187,8 @@ class TicketsViewSet(viewsets.ModelViewSet):
             <h3><strong>Detalhes do ingresso:</strong></h3>
             <ul>
                 <li><strong>ID:</strong> {ticket.uuid}</li>
-                <li><strong>Valor:</strong> R${ticket.purchase.value}</li>
-                <li><strong>Data de compra:</strong> {ticket.purchase.created_at}</li>
+                <li><strong>Valor:</strong> R${ticket.cart_payment.value}</li>
+                <li><strong>Data de compra:</strong> {ticket.cart_payment.created_at}</li>
             </ul>
             
             <p>Anexado a este email, você encontrará o ingresso com o <strong>código QR</strong> que deverá ser apresentado na entrada do evento.</p>

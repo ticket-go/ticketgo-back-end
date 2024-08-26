@@ -8,7 +8,7 @@ from requests import HTTPError
 from dotenv import load_dotenv
 from functools import partialmethod
 
-from apps.financial.models import Payment
+from apps.financial.models import CartPayment
 from .api.serializers import AsaasCustomerSerializer
 
 
@@ -90,11 +90,11 @@ class AssasPaymentClient:
         all_payments = response["data"]
         for payment in all_payments:
             try:
-                existing_payment = Payment.objects.get(external_id=payment["id"])
+                existing_payment = CartPayment.objects.get(external_id=payment["id"])
                 existing_payment.status = payment["status"]
                 existing_payment.payment_type = payment["billingType"]
                 existing_payment.save()
-            except Payment.DoesNotExist:
+            except CartPayment.DoesNotExist:
                 pass
 
 

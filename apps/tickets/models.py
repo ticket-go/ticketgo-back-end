@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from apps.core.models import BaseModel
-from apps.financial.models import Purchase
+from apps.financial.models import CartPayment
 from apps.users.models import CustomUser
 from apps.events.models import Event
 
@@ -25,10 +25,10 @@ class Ticket(BaseModel):
         related_name="linked_user",
         verbose_name=_("Usuário"),
     )
-    purchase = models.ForeignKey(
-        Purchase,
+    cart_payment = models.ForeignKey(
+        CartPayment,
         on_delete=models.CASCADE,
-        related_name="linked_purchase",
+        related_name="linked_card_payments",
         verbose_name=_("Compra"),
         null=True,
     )

@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from apps.financial.models import Payment, Purchase
+from apps.financial.models import CartPayment
 
 # Register your models here.
-admin.site.register(Purchase)
-admin.site.register(Payment)
+admin.site.register(CartPayment)
