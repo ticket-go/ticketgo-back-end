@@ -1,64 +1,58 @@
 from apps.users.api.serializers import CustomUserSerializer
 from rest_framework import serializers
-from apps.financial.models import Payment, Purchase
-from apps.tickets.api.serializers import TicketSerializer
+from apps.financial.models import CartPayment
 from drf_spectacular.utils import extend_schema_field
 
 
-class PurchaseSerializer(serializers.ModelSerializer):
+class CartPaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Purchase
-        fields = ["uuid", "value", "status", "user", "user_data", "tickets"]
+        model = CartPayment
+        fields = [
+            "uuid",
+            "value",
+            "status",
+            "external_id",
+            "payment_type",
+            "status",
+            "link_payment",
+            "user",
+            "user_data",
+            "tickets",
+        ]
 
-    tickets = TicketSerializer(many=True, read_only=True)
+    external_id = serializers.CharField(read_only=True)
+    link_payment = serializers.CharField(read_only=True)
+    payment_type = serializers.CharField(read_only=True)
+    status = serializers.CharField(read_only=True)
+    value = serializers.CharField(read_only=True)
+    user = serializers.UUIDField(read_only=True)
+    tickets = serializers.SerializerMethodField(read_only=True)
     user_data = serializers.SerializerMethodField(read_only=True)
 
     @extend_schema_field(CustomUserSerializer)
     def get_user_data(self, obj):
         return CustomUserSerializer(obj.user).data
 
-
-class PaymentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Payment
-        fields = [
-            "uuid",
-            "external_id",
-            "payment_type",
-            "status",
-            "link_payment",
-            "purchase",
-            "purchase_data",
-        ]
-
-    external_id = serializers.CharField(read_only=True)
-    link_payment = serializers.CharField(read_only=True)
-    payment_type = serializers.CharField(read_only=True)
-    purchase = serializers.CharField(source="purchase.uuid")
-    purchase_data = serializers.SerializerMethodField(read_only=True)
-
-    @extend_schema_field(PurchaseSerializer)
-    def get_purchase_data(self, obj):
-        return PurchaseSerializer(obj.purchase).data
+    def get_tickets(self, obj):
+        uuid_tickets = obj.linked_card_payments.values_list("uuid", flat=True)
+        return uuid_tickets
     
     def create(self, validated_data):
-        purchase_uuid = validated_data.pop("purchase")
-        purchase = Purchase.objects.get(uuid=purchase_uuid["uuid"])
-        payment = Payment.objects.create(purchase=purchase, **validated_data)
-        return payment
+        user = self.context["request"].user
+        cart_payment = CartPayment.objects.create(user=user, **validated_data)
+        return cart_payment
 
 
 class CreateInvoiceSerializer(serializers.Serializer):
-    payment = serializers.UUIDField()
+    cart_payment = serializers.UUIDField()
 
-    def validate_payment_id(self, value):
+    def validate_cart_payment_id(self, value):
         try:
-            payment = Payment.objects.get(uuid=value)
-        except Payment.DoesNotExist:
-            raise serializers.ValidationError("Pagamento não encontrado.")
-        return payment
+            cart_payment = CartPayment.objects.get(uuid=value)
+        except CartPayment.DoesNotExist:
+            raise serializers.ValidationError("Compra não encontrada.")
+        return cart_payment
 
 
 class ListPaymentsSerializer(serializers.Serializer):

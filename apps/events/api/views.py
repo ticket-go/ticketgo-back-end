@@ -11,3 +11,6 @@ class EventsViewSet(viewsets.ModelViewSet):
     lookup_field = "uuid"
     filterset_class = EventFilter
     permission_classes = [AllowListOnly]
+
+    def get_serializer_context(self):
+        return {'request': self.request}

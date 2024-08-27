@@ -1,5 +1,6 @@
 import os
 
+from apps.financial.filter import CartPaymentFilter
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from drf_spectacular.utils import extend_schema
@@ -9,15 +10,13 @@ from rest_framework.permissions import IsAuthenticated
 
 
 from apps.financial.api.serializers import (
+    CartPaymentSerializer,
     CreateInvoiceSerializer,
     ListPaymentsSerializer,
-    PaymentSerializer,
-    PurchaseSerializer,
 )
 from apps.financial.asaas import AssasPaymentClient
-from apps.financial.models import Payment, Purchase
+from apps.financial.models import CartPayment
 
-from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
@@ -28,52 +27,15 @@ load_dotenv()
 ACCESS_TOKEN_ASASS = os.getenv("ASAAS_ACCESS_TOKEN")
 
 
-class PurchasesViewSet(viewsets.ModelViewSet):
-    queryset = Purchase.objects.all()
-    serializer_class = PurchaseSerializer
+class CartPaymentsViewSet(viewsets.ModelViewSet):
+    queryset = CartPayment.objects.all()
+    serializer_class = CartPaymentSerializer
     lookup_field = "uuid"
     permission_classes = [permissions.IsAuthenticated]
+    filterset_class = CartPaymentFilter
 
-    @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated])
-    def history(self, request, uuid=None):
-        purchase = self.get_object()
-        history = purchase.history.all()
-
-        history_data = []
-        for entry in history:
-            if entry.prev_record:
-                diff = entry.diff_against(entry.prev_record)
-                changes = []
-                for change in diff.changes:
-                    field = Purchase._meta.get_field(change.field)
-                    verbose_name = field.verbose_name
-                    changes.append(
-                        {
-                            "field": verbose_name,
-                            "old_value": change.old,
-                            "new_value": change.new,
-                        }
-                    )
-            else:
-                changes = "Initial creation"
-
-            history_data.append(
-                {
-                    "history_id": entry.history_id,
-                    "history_date": entry.history_date,
-                    "history_change_reason": entry.history_change_reason,
-                    "changes": changes,
-                }
-            )
-
-        return Response(history_data)
-
-
-class PaymentsViewSet(viewsets.ModelViewSet):
-    queryset = Payment.objects.all()
-    serializer_class = PaymentSerializer
-    lookup_field = "uuid"
-    permission_classes = [permissions.IsAuthenticated]
+    def get_serializer_context(self):
+        return {"request": self.request}
 
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -89,7 +51,7 @@ class PaymentsViewSet(viewsets.ModelViewSet):
                 diff = entry.diff_against(entry.prev_record)
                 changes = []
                 for change in diff.changes:
-                    field = Payment._meta.get_field(change.field)
+                    field = CartPayment._meta.get_field(change.field)
                     verbose_name = field.verbose_name
                     changes.append(
                         {
@@ -133,11 +95,11 @@ class InvoicesAPIView(GenericAPIView):
     def post(self, request):
         serializer = CreateInvoiceSerializer(data=request.data)
         if serializer.is_valid():
-            payment_uuid = serializer.validated_data["payment"]
-            payment = Payment.objects.get(uuid=payment_uuid)
+            payment_uuid = serializer.validated_data["cart_payment"]
+            payment = CartPayment.objects.get(uuid=payment_uuid)
 
             client = AssasPaymentClient()
-            customer = client.create_or_update_customer(payment.purchase.user)
+            customer = client.create_or_update_customer(payment.user)
             data = self.prepare_payment_data(payment, customer)
             response = self.send_payment_request(data)
 
@@ -154,7 +116,7 @@ class InvoicesAPIView(GenericAPIView):
         data = {
             "customer": customer.get("id"),
             "billingType": "UNDEFINED",
-            "value": float(payment.purchase.value),
+            "value": float(payment.value),
             "dueDate": end_date_str,
             "description": "Compre seus ingressos online de forma rápida e segura!",
             "externalReference": str(payment.uuid),

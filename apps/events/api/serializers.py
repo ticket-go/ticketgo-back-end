@@ -8,19 +8,11 @@ from drf_spectacular.utils import extend_schema_field
 
 
 class EventsSerializer(serializers.ModelSerializer):
-    address_id = serializers.PrimaryKeyRelatedField(
-        queryset=Address.objects.all(),
-        source="address",
+    address = serializers.UUIDField(
         write_only=True,
         required=False,
     )
-    user_uuid = serializers.PrimaryKeyRelatedField(
-        queryset=CustomUser.objects.all(),
-        source="user",
-        write_only=True,
-        required=False,
-    )
-    address = AddressSerializer(read_only=True)
+    address_data = AddressSerializer(read_only=True)
     user = CustomUserSerializer(read_only=True)
     tickets_sold = serializers.IntegerField(read_only=True)
     tickets_available = serializers.IntegerField(read_only=True)
@@ -55,17 +47,16 @@ class EventsSerializer(serializers.ModelSerializer):
             "is_top_event",
             "is_hero_event",
             "address",
-            "address_id",
+            "address_data",
             "user",
-            "user_uuid",
         ]
-    
+
     def get_image_url(self, obj):
-        request = self.context.get('request')
-        if obj.image and hasattr(obj.image, 'url'):
+        request = self.context.get("request")
+        if obj.image and hasattr(obj.image, "url"):
             return request.build_absolute_uri(obj.image.url)
         return None
-    
+
     @extend_schema_field(serializers.CharField())
     def get_category_display(self, obj):
         return obj.get_category_display()
@@ -85,8 +76,7 @@ class EventsSerializer(serializers.ModelSerializer):
             self.fields["image"].required = True
             self.fields["ticket_value"].required = True
             self.fields["ticket_quantity"].required = True
-            self.fields["address_id"].required = True
-            self.fields["user_uuid"].required = True
+            self.fields["address"].required = True
         else:
             self.fields["name"].required = False
             self.fields["date"].required = False
@@ -97,23 +87,19 @@ class EventsSerializer(serializers.ModelSerializer):
             self.fields["image"].required = False
             self.fields["ticket_value"].required = False
             self.fields["ticket_quantity"].required = False
-            self.fields["address_id"].required = False
-            self.fields["user_uuid"].required = False
+            self.fields["address"].required = False
 
     def create(self, validated_data):
-        address = Address.objects.get(pk=validated_data.pop("address_id"))
-        user = CustomUser.objects.get(pk=validated_data.pop("user_uuid"))
+        address = Address.objects.get(uuid=validated_data.pop("address"))
+        user = self.context["request"].user
 
         event = Event.objects.create(address=address, user=user, **validated_data)
         return event
 
     def update(self, instance, validated_data):
-        address_id = validated_data.pop("address_id", None)
-        user_uuid = validated_data.pop("user_uuid", None)
+        address = validated_data.pop("address", None)
 
-        if address_id:
-            instance.address = Address.objects.get(pk=address_id)
-        if user_uuid:
-            instance.user = CustomUser.objects.get(pk=user_uuid)
+        if address:
+            instance.address = Address.objects.get(uuid=address)
 
         return super().update(instance, validated_data)
