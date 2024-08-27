@@ -39,6 +39,7 @@ class TicketSerializer(serializers.ModelSerializer):
         ]
 
     hash = serializers.CharField(read_only=True)
+    verified = serializers.BooleanField(read_only=True)
     user = CustomUserSerializer(read_only=True)
     event = serializers.ReadOnlyField(source="event.uuid", read_only=True)
     cart_payment = serializers.UUIDField(write_only=True)

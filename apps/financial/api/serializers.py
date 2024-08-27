@@ -24,6 +24,9 @@ class CartPaymentSerializer(serializers.ModelSerializer):
     external_id = serializers.CharField(read_only=True)
     link_payment = serializers.CharField(read_only=True)
     payment_type = serializers.CharField(read_only=True)
+    status = serializers.CharField(read_only=True)
+    value = serializers.CharField(read_only=True)
+    user = serializers.UUIDField(read_only=True)
     tickets = serializers.SerializerMethodField(read_only=True)
     user_data = serializers.SerializerMethodField(read_only=True)
 
