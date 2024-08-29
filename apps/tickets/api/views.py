@@ -74,27 +74,31 @@ class TicketsViewSet(viewsets.ModelViewSet):
             message = "Não há mais ingressos disponíveis para este evento."
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
-        if is_half_ticket and event.half_tickets_available == 0:
+        if is_half_ticket == True and event.half_tickets_available == 0:
             message = "Não há mais ingressos do tipo meia-entrada disponíveis para este evento."
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Check if there are half tickets for the event
+        if is_half_ticket == True and event.half_ticket_quantity == 0:
+            message = "Não há meia entrada disponível para este evento."
+            return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
         # Update the ticket count for the event
-        if is_half_ticket:
+        if is_half_ticket == True and event.half_tickets_available:
             event.half_tickets_available -= 1
         else:
             event.tickets_available -= 1
         event.tickets_sold += 1
         event.save()
 
-        # Check if there are half tickets for the event
-        if not event.half_ticket_value:
-            message = "Não há meia entrada disponível para este evento."
-            return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+        is_half_ticket = serializer.validated_data.get("half_ticket", False)
 
         payment = self.get_payment()
         # Update the payment value
         half_ticket = serializer.validated_data.get("half_ticket", False)
-        ticket_value = event.half_ticket_value if half_ticket else event.ticket_value
+        ticket_value = (
+            event.half_ticket_value if half_ticket == True else event.ticket_value
+        )
         payment.value += ticket_value
         payment.save()
 
