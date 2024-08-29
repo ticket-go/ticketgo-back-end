@@ -56,14 +56,14 @@ class Event(BaseModel):
         max_digits=10,
         decimal_places=2,
         verbose_name=_("Valor do ingresso do tipo meia-entrada"),
-        null=True,
+        default=0,
         blank=True,
     )
     ticket_quantity = models.IntegerField(
         null=False, verbose_name=_("Quantidade de ingressos do tipo inteira")
     )
     half_ticket_quantity = models.IntegerField(
-        null=True,
+        default=0,
         blank=True,
         verbose_name=_("Quantidade de ingressos do tipo meia-entrada"),
     )
