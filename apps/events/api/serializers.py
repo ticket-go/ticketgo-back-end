@@ -8,11 +8,8 @@ from drf_spectacular.utils import extend_schema_field
 
 
 class EventsSerializer(serializers.ModelSerializer):
-    address = serializers.UUIDField(
-        write_only=True,
-        required=False,
-    )
-    address_data = AddressSerializer(read_only=True)
+    address = serializers.UUIDField(write_only=True)
+    address_data = AddressSerializer(source="address", read_only=True)
     user = CustomUserSerializer(read_only=True)
     tickets_sold = serializers.IntegerField(read_only=True)
     tickets_available = serializers.IntegerField(read_only=True)
