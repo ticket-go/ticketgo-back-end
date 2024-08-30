@@ -9,7 +9,8 @@
             "half_ticket": false,
             "hash": "a6a2fb7c0b6f0b8c88ccf4c820ff6c527067954c7374a5cf65b66f62ca41062e",
             "event": 1,
-            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4"
+            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4",
+            "cart_payment": 1
         }
     },
     {
@@ -22,7 +23,8 @@
             "half_ticket": true,
             "hash": "11925093e8b0a81c545a09b78a25b7fccd4334c1720bf6d287b9fbc2153d2b39",
             "event": 3,
-            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4"
+            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4",
+            "cart_payment": 1
         }
     },
     {
@@ -35,7 +37,8 @@
             "half_ticket": false,
             "hash": "fec70cf46373fdb6d2b441cc162b3f42514a943a06ea6e00311e508f974f9386",
             "event": 3,
-            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4"
+            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4",
+            "cart_payment": 1
         }
     },
     {
@@ -48,7 +51,8 @@
             "half_ticket": true,
             "hash": "e3ed0dd391520e53e61e6377188b17997eeaf973d76bdb1c6eedbb88abf306ab",
             "event": 3,
-            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4"
+            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4",
+            "cart_payment": 1
         }
     },
     {
@@ -61,7 +65,8 @@
             "half_ticket": false,
             "hash": "a6f03d5d544b6af7f3d2d2c0a2443c5ba3ee8262be5de6c81ecfe985d7c0fce6",
             "event": 3,
-            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4"
+            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4",
+            "cart_payment": 2
         }
     },
     {
@@ -74,7 +79,8 @@
             "half_ticket": true,
             "hash": "c067adda9ba34cbf0903937f923ee9b87e607e803cd8ee4e9232fb943cf62422",
             "event": 3,
-            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4"
+            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4",
+            "cart_payment": 3
         }
     },
     {
@@ -87,7 +93,8 @@
             "half_ticket": false,
             "hash": "8da7b1dceb4f78db625842968ce5d32db23f51e000e4bad511fc34b8e4bca78b",
             "event": 3,
-            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
+            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3",
+            "cart_payment": 4
         }
     },
     {
@@ -100,7 +107,8 @@
             "half_ticket": true,
             "hash": "0e274ae3105cbf7fcdb82710784a323eca4e1d731ec670183569d7ba9f5cde4f",
             "event": 3,
-            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
+            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3",
+            "cart_payment": 4
         }
     },
     {
@@ -113,7 +121,8 @@
             "half_ticket": false,
             "hash": "d69579c54cf0e45916dfec38fc102e1e097750695735c5c477d8ca0c70c267a9",
             "event": 2,
-            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
+            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3",
+            "cart_payment": 4
         }
     },
     {
@@ -126,7 +135,8 @@
             "half_ticket": true,
             "hash": "203961e7f9177981695da29dad97f488c1d656d9121f363158fc1fb937a20cf5",
             "event": 1,
-            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
+            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3",
+            "cart_payment": 4
         }
     },
     {
@@ -139,7 +149,8 @@
             "half_ticket": false,
             "hash": "754c8b28b156c370ff53157b7c2659da28a8815aa75f5f3a64bb672a6382241b",
             "event": 1,
-            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
+            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3",
+            "cart_payment": 5
         }
     },
     {
@@ -152,7 +163,8 @@
             "half_ticket": true,
             "hash": "111a4e3dd16dd0c59a092d429f0a34897442ce189aa4ea1c5ff50545a21e05b0",
             "event": 1,
-            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
+            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3",
+            "cart_payment": 5
         }
     }
 
