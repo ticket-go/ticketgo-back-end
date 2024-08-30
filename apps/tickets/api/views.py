@@ -225,13 +225,14 @@ class VerifyTicketViewSet(generics.UpdateAPIView):
             )
 
         event = get_object_or_404(Event, uuid=event_uuid)
-        ticket = get_object_or_404(
-            Ticket, event=event, hash=hash_value
-        )
+        ticket = get_object_or_404(Ticket, event=event, hash=hash_value)
 
         if ticket.verified:
             return Response(
-                {"message": "Ingresso já verificado!"}, status=status.HTTP_200_OK
+                {
+                    "message": "Este ingresso já foi verificado. Por favor, verifique outro ingresso ou entre em contato com o suporte se você achar que isso é um erro."
+                },
+                status=status.HTTP_409_CONFLICT,
             )
 
         ticket.verified = True

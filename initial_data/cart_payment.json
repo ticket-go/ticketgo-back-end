@@ -7,8 +7,8 @@
             "created_at": "2024-08-30T12:00:00Z",
             "updated_at": "2024-08-30T12:00:00Z",
             "payment_type": "credit_card",
-            "status": "PENDING",
-            "value": 240.00,
+            "status": "CONFIRMED",
+            "value": 550.00,
             "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
         }
     },
@@ -20,8 +20,8 @@
             "created_at": "2024-08-30T12:00:00Z",
             "updated_at": "2024-08-30T12:00:00Z",
             "payment_type": "credit_card",
-            "status": "PENDING",
-            "value": 0.00,
+            "status": "CONFIRMED",
+            "value": 150.00,
             "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
         }
     },
@@ -33,8 +33,8 @@
             "created_at": "2024-08-30T12:00:00Z",
             "updated_at": "2024-08-30T12:00:00Z",
             "payment_type": "credit_card",
-            "status": "PENDING",
-            "value": 100.00,
+            "status": "CONFIRMED",
+            "value": 150.00,
             "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
         }
     },
@@ -47,7 +47,7 @@
             "updated_at": "2024-08-30T12:00:00Z",
             "payment_type": "credit_card",
             "status": "CONFIRMED",
-            "value": 520.00,
+            "value": 575.00,
             "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4"
         }
     },
@@ -60,7 +60,7 @@
             "updated_at": "2024-08-30T12:00:00Z",
             "payment_type": "credit_card",
             "status": "CONFIRMED",
-            "value": 300.00,
+            "value": 150.00,
             "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4"
         }
     }

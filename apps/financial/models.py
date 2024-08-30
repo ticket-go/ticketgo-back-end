@@ -49,6 +49,10 @@ class CartPayment(BaseModel):
 
     history = HistoricalRecords()
 
+    class Meta:
+        verbose_name = _("Compra")
+        verbose_name_plural = _("Compras")
+
     def __str__(self) -> str:
         return self.user.username + " - " + str(self.value)
 

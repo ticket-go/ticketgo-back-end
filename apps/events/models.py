@@ -104,8 +104,8 @@ class Event(BaseModel):
     )
 
     class Meta:
-        verbose_name = _("Event")
-        verbose_name_plural = _("Events")
+        verbose_name = _("Evento")
+        verbose_name_plural = _("Eventos")
 
     def save(self, *args, **kwargs):
         if not self.pk:

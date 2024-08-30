@@ -40,5 +40,12 @@ class CustomUser(AbstractUser):
     )
     history = HistoricalRecords()
 
+    class Meta:
+        verbose_name = _("Usuário")
+        verbose_name_plural = _("Usuários")
+
     def get_user_id(self):
         return self.user_id
+
+    def __str__(self):
+        return self.username
