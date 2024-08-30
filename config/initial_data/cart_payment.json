@@ -1,0 +1,67 @@
+[
+    {
+        "model": "financial.cartPayment",
+        "pk": 1,
+        "fields": {
+            "uuid": "b6d1ce9e-00cb-4a7b-8994-cc5be2802484",
+            "created_at": "2024-08-30T12:00:00Z",
+            "updated_at": "2024-08-30T12:00:00Z",
+            "payment_type": "credit_card",
+            "status": "CONFIRMED",
+            "value": 550.00,
+            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
+        }
+    },
+    {
+        "model": "financial.cartPayment",
+        "pk": 2,
+        "fields": {
+            "uuid": "c9144548-ebab-4716-9c92-ec5fee4cd1b5",
+            "created_at": "2024-08-30T12:00:00Z",
+            "updated_at": "2024-08-30T12:00:00Z",
+            "payment_type": "credit_card",
+            "status": "CONFIRMED",
+            "value": 150.00,
+            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
+        }
+    },
+    {
+        "model": "financial.cartPayment",
+        "pk": 3,
+        "fields": {
+            "uuid": "d5bb4d39-e9e5-4223-9c7d-0776f949d64a",
+            "created_at": "2024-08-30T12:00:00Z",
+            "updated_at": "2024-08-30T12:00:00Z",
+            "payment_type": "credit_card",
+            "status": "CONFIRMED",
+            "value": 150.00,
+            "user": "d43c753c-17b1-4be7-a830-c5b51f825fb3"
+        }
+    },
+    {
+        "model": "financial.cartPayment",
+        "pk": 4,
+        "fields": {
+            "uuid": "375e44d9-1bd9-4900-b21b-cfea592c686d",
+            "created_at": "2024-08-30T12:00:00Z",
+            "updated_at": "2024-08-30T12:00:00Z",
+            "payment_type": "credit_card",
+            "status": "CONFIRMED",
+            "value": 575.00,
+            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4"
+        }
+    },
+    {
+        "model": "financial.cartPayment",
+        "pk": 5,
+        "fields": {
+            "uuid": "9930aa1d-164c-44c5-a087-ea817046375e",
+            "created_at": "2024-08-30T12:00:00Z",
+            "updated_at": "2024-08-30T12:00:00Z",
+            "payment_type": "credit_card",
+            "status": "CONFIRMED",
+            "value": 150.00,
+            "user": "0c62df36-67d3-4704-b5b6-c8a05e67cae4"
+        }
+    }
+]

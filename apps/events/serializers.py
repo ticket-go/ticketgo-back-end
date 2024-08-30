@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from apps.events.models import Event
 from apps.address.models import Address
-from apps.address.api.serializers import AddressSerializer
+from apps.address.serializers import AddressSerializer
 from apps.core.models import CustomUser
-from apps.users.api.serializers import CustomUserSerializer
+from apps.users.serializers import CustomUserSerializer
 from drf_spectacular.utils import extend_schema_field
 
 

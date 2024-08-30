@@ -33,6 +33,13 @@ class Ticket(BaseModel):
         null=True,
     )
 
+    class Meta:
+        verbose_name = _("Ingresso")
+        verbose_name_plural = _("Ingressos")
+
+    def __str__(self):
+        return f"{self.event} - {self.user}"
+
     def save(self, *args, **kwargs):
         if not self.hash:
             hash_string = f"{self.id}-{self.event_id}-{self.user_id}"

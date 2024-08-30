@@ -1,0 +1,87 @@
+[
+    {
+        "model": "address.address",
+        "pk": 1,
+        "fields": {
+            "uuid": "2d699fc1-6d2b-40c8-be27-048db2266654",
+            "created_at": "2023-08-01T12:00:00Z",
+            "updated_at": "2023-08-01T12:00:00Z",
+            "street": "Rua A",
+            "number": 123,
+            "district": "Bairro A",
+            "city": "Cidade A",
+            "state": "SP",
+            "country": "Brasil",
+            "zip_code": "12345-678",
+            "complement": "Apto 101"
+        }
+    },
+    {
+        "model": "address.address",
+        "pk": 2,
+        "fields": {
+            "uuid": "21e60a13-bea0-411d-8716-5913a23938e3",
+            "created_at": "2023-08-01T12:00:00Z",
+            "updated_at": "2023-08-01T12:00:00Z",
+            "street": "Rua B",
+            "number": 456,
+            "district": "Bairro B",
+            "city": "Cidade B",
+            "state": "RJ",
+            "country": "Brasil",
+            "zip_code": "23456-789",
+            "complement": ""
+        }
+    },
+    {
+        "model": "address.address",
+        "pk": 3,
+        "fields": {
+            "uuid": "e59b31fc-edb8-41c9-b164-ace9754e77d8",
+            "created_at": "2023-08-01T12:00:00Z",
+            "updated_at": "2023-08-01T12:00:00Z",
+            "street": "Rua C",
+            "number": 789,
+            "district": "Bairro C",
+            "city": "Cidade C",
+            "state": "MG",
+            "country": "Brasil",
+            "zip_code": "34567-890",
+            "complement": "Casa"
+        }
+    },
+    {
+        "model": "address.address",
+        "pk": 4,
+        "fields": {
+            "uuid": "c2e9a161-da8d-40b3-844b-d806cc608f4c",
+            "created_at": "2023-08-01T12:00:00Z",
+            "updated_at": "2023-08-01T12:00:00Z",
+            "street": "Rua D",
+            "number": 101,
+            "district": "Bairro D",
+            "city": "Cidade D",
+            "state": "BA",
+            "country": "Brasil",
+            "zip_code": "45678-901",
+            "complement": ""
+        }
+    },
+    {
+        "model": "address.address",
+        "pk": 5,
+        "fields": {
+            "uuid": "fde5f9b3-251e-458d-ad6f-43b46eed9b75",
+            "created_at": "2023-08-01T12:00:00Z",
+            "updated_at": "2023-08-01T12:00:00Z",
+            "street": "Rua E",
+            "number": 202,
+            "district": "Bairro E",
+            "city": "Cidade E",
+            "state": "PR",
+            "country": "Brasil",
+            "zip_code": "56789-012",
+            "complement": "Bloco B"
+        }
+    }
+]

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from functools import partialmethod
 
 from apps.financial.models import CartPayment
-from .api.serializers import AsaasCustomerSerializer
+from .serializers import AsaasCustomerSerializer
 
 
 load_dotenv()

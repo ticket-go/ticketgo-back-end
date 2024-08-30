@@ -51,8 +51,8 @@ class Address(BaseModel):
     )
 
     class Meta:
-        verbose_name = _("Address")
-        verbose_name_plural = _("Address's ")
+        verbose_name = _("Endereço")
+        verbose_name_plural = _("Endereços")
 
     def __str__(self):
         return self.street + " - " + self.district + " - " + self.state

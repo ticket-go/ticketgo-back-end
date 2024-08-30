@@ -1,4 +1,4 @@
-from apps.users.api.serializers import CustomUserSerializer
+from apps.users.serializers import CustomUserSerializer
 from rest_framework import serializers
 from apps.financial.models import CartPayment
 from drf_spectacular.utils import extend_schema_field
