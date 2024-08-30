@@ -1,9 +1,14 @@
+import os
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from apps.address.models import Address
 from apps.core.models import BaseModel, CustomUser
+
+
+def event_image_upload_to(instance, filename):
+    return os.path.join(f"events/{instance.uuid}", filename)
 
 
 class Event(BaseModel):
@@ -46,7 +51,9 @@ class Event(BaseModel):
         null=False,
         verbose_name=_("Status"),
     )
-    image = models.ImageField(upload_to="events", null=False, verbose_name=_("Banner"))
+    image = models.ImageField(
+        upload_to=event_image_upload_to, blank=True, verbose_name=_("Banner")
+    )
     ticket_value = models.DecimalField(
         max_digits=10,
         decimal_places=2,

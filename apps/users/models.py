@@ -1,3 +1,4 @@
+import os
 from uuid import uuid4
 from datetime import date
 
@@ -11,6 +12,10 @@ from simple_history.models import HistoricalRecords
 from apps.utils.cpf_cnpj.models import CNPJField, CPFField
 
 
+def user_image_upload_to(instance, filename):
+    return os.path.join(f"users/{instance.user_id}", filename)
+
+
 class CustomUser(AbstractUser):
     GENDER_CHOICES = (("M", _("Homem")), ("F", _("Mulher")), ("O", _("Outro")))
 
@@ -22,6 +27,9 @@ class CustomUser(AbstractUser):
         validators=[MaxValueValidator(limit_value=date.today)],
         verbose_name=_("Data de Nascimento"),
         default=date(2000, 1, 1),
+    )
+    image = models.ImageField(
+        upload_to=user_image_upload_to, blank=True, verbose_name=_("Imagem do Usuário")
     )
     gender = models.CharField(
         max_length=1,

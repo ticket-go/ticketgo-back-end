@@ -37,7 +37,7 @@ class CartPaymentSerializer(serializers.ModelSerializer):
     def get_tickets(self, obj):
         uuid_tickets = obj.linked_card_payments.values_list("uuid", flat=True)
         return uuid_tickets
-    
+
     def create(self, validated_data):
         user = self.context["request"].user
         cart_payment = CartPayment.objects.create(user=user, **validated_data)
