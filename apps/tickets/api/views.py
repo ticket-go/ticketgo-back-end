@@ -217,7 +217,6 @@ class VerifyTicketViewSet(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         event_uuid = kwargs.get("event_uuid")
-        ticket_uuid = kwargs.get("ticket_uuid")
 
         hash_value = request.data.get("hash")
         if not hash_value:
@@ -227,7 +226,7 @@ class VerifyTicketViewSet(generics.UpdateAPIView):
 
         event = get_object_or_404(Event, uuid=event_uuid)
         ticket = get_object_or_404(
-            Ticket, uuid=ticket_uuid, event=event, hash=hash_value
+            Ticket, event=event, hash=hash_value
         )
 
         if ticket.verified:

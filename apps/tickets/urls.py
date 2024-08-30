@@ -4,7 +4,7 @@ from apps.tickets.api.views import VerifyTicketViewSet
 
 urlpatterns = [
     path(
-        "events/<str:event_uuid>/tickets/<str:ticket_uuid>/verify/",
+        "events/<str:event_uuid>/",
         VerifyTicketViewSet.as_view(),
         name="verify_ticket",
     ),
