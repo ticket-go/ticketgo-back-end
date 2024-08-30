@@ -1,6 +1,6 @@
 from apps.events.filter import EventFilter
 from apps.events.permissions import AllowListOnly
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets
 from apps.events.serializers import EventsSerializer
 from apps.events.models import Event
 
@@ -13,4 +13,4 @@ class EventsViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowListOnly]
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}

@@ -26,6 +26,9 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = "user_id"
     permission_classes = [AllowCreateOnly]
 
+    def get_serializer_context(self):
+        return {"request": self.request, "format": self.format_kwarg, "view": self}
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(
             data=request.data, context={"request": request}
@@ -157,6 +160,9 @@ class LoginViewSet(APIView):
 
     serializer_class = serializers.LoginSerializer
 
+    def get_serializer_context(self):
+        return {"request": self.request, "format": self.format_kwarg, "view": self}
+
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -182,7 +188,9 @@ class LoginViewSet(APIView):
                     {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-            user_data = serializers.CustomUserSerializer(user).data
+            user_data = serializers.CustomUserSerializer(
+                user, context=self.get_serializer_context()
+            ).data
 
             return Response(
                 {

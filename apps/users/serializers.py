@@ -10,6 +10,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     address_id = serializers.PrimaryKeyRelatedField(
         queryset=Address.objects.all(), required=False
     )
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = models.CustomUser
@@ -23,12 +24,20 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "cpf",
             "email",
             "gender",
+            "image",
             "privileged",
             "address",
             "address_id",
             "password",
         ]
         read_only_fields = ["user_id"]
+
+    def get_image(self, obj):
+        if obj.image:
+            request = self.context.get("request")
+            if request is not None:
+                return request.build_absolute_uri(obj.image.url)
+        return None
 
     def __init__(self, *args, **kwargs):
         context = kwargs.get("context", {})

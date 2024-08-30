@@ -15,7 +15,7 @@ class EventsSerializer(serializers.ModelSerializer):
     tickets_available = serializers.IntegerField(read_only=True)
     half_tickets_available = serializers.IntegerField(read_only=True)
     tickets_verified = serializers.IntegerField(read_only=True)
-    image_url = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField(read_only=True)
     category_display = serializers.SerializerMethodField()
     status_display = serializers.SerializerMethodField()
 
@@ -32,7 +32,6 @@ class EventsSerializer(serializers.ModelSerializer):
             "status",
             "status_display",
             "image",
-            "image_url",
             "ticket_value",
             "half_ticket_value",
             "ticket_quantity",
@@ -48,7 +47,7 @@ class EventsSerializer(serializers.ModelSerializer):
             "user",
         ]
 
-    def get_image_url(self, obj):
+    def get_image(self, obj):
         request = self.context.get("request")
         if obj.image and hasattr(obj.image, "url"):
             return request.build_absolute_uri(obj.image.url)
@@ -70,7 +69,6 @@ class EventsSerializer(serializers.ModelSerializer):
             self.fields["time"].required = True
             self.fields["category"].required = True
             self.fields["status"].required = True
-            self.fields["image"].required = True
             self.fields["ticket_value"].required = True
             self.fields["ticket_quantity"].required = True
             self.fields["address"].required = True
@@ -81,7 +79,6 @@ class EventsSerializer(serializers.ModelSerializer):
             self.fields["description"].required = False
             self.fields["category"].required = False
             self.fields["status"].required = False
-            self.fields["image"].required = False
             self.fields["ticket_value"].required = False
             self.fields["ticket_quantity"].required = False
             self.fields["address"].required = False
