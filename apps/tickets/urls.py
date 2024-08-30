@@ -1,6 +1,6 @@
 from django.urls import path
 
-from apps.tickets.api.views import VerifyTicketViewSet
+from apps.tickets.views import VerifyTicketViewSet
 
 urlpatterns = [
     path(

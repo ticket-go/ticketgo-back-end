@@ -1,6 +1,6 @@
 from django.urls import path
 
-from apps.financial.api.views import InvoicesAPIView
+from apps.financial.views import InvoicesAPIView
 
 urlpatterns = [
     path(

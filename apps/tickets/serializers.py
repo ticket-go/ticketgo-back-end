@@ -1,5 +1,5 @@
 from apps.financial.models import CartPayment
-from apps.users.api.serializers import CustomUserSerializer
+from apps.users.serializers import CustomUserSerializer
 from rest_framework import serializers
 from apps.tickets.models import Ticket
 

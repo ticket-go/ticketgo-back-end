@@ -1,5 +1,5 @@
 from django.urls import path
-from apps.users.api.views import (
+from apps.users.views import (
     LoginViewSet,
     CustomUserChangePasswordViewSet,
     LogoutViewSet,

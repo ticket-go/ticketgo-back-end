@@ -1,4 +1,4 @@
-from apps.address.api.serializers import AddressSerializer
+from apps.address.serializers import AddressSerializer
 from apps.address.models import Address
 from rest_framework import serializers
 from apps.users import models
