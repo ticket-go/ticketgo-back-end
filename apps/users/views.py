@@ -203,6 +203,61 @@ class LoginViewSet(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class LoginMobileViewSet(APIView):
+
+    serializer_class = serializers.LoginSerializer
+
+    def get_serializer_context(self):
+        return {"request": self.request, "format": self.format_kwarg, "view": self}
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data.get("username")
+            password = serializer.validated_data.get("password")
+
+            try:
+                user = CustomUser.objects.get(username=username)
+            except CustomUser.DoesNotExist:
+                return Response(
+                    {"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
+                )
+
+            if user.privileged == False:
+                return Response(
+                    {
+                        "error": "User does not have permission to access this application"
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
+            if not user.check_password(password):
+                return Response(
+                    {"error": "Incorrect password"}, status=status.HTTP_401_UNAUTHORIZED
+                )
+
+            try:
+                access_token = RefreshToken.for_user(user)
+            except TokenError as e:
+                return Response(
+                    {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            user_data = serializers.CustomUserSerializer(
+                user, context=self.get_serializer_context()
+            ).data
+
+            return Response(
+                {
+                    "access_token": str(access_token.access_token),
+                    "refresh_token": str(access_token),
+                    "user": user_data,
+                },
+                status=status.HTTP_200_OK,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class LogoutViewSet(APIView):
     permission_classes = [IsAuthenticated]
 
