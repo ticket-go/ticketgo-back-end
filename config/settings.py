@@ -146,16 +146,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Static
 
-STATIC_URL = "apps/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "apps/static/assets")
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATIC_ROOT = os.path.join(BASE_DIR, "apps/static/assets")
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "apps/static"),
+    os.path.join(BASE_DIR, "static"),
 ]
 
 
