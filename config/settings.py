@@ -19,6 +19,7 @@ ALLOWED_HOSTS = [
     "ticketgo-backend-dev.onrender.com",
     "10.0.2.2",  # IP do emulador Android
     env("IP_LOCAL"),  # IP local da sua máquina
+    env("IP_PROD"),  # IP prod
 ]
 
 
