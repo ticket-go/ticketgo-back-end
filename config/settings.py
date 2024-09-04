@@ -102,7 +102,7 @@ TEMPLATES = [
 ]
 
 
-WSGI_APPLICATION = "config.wsgi.application"
+WSGI_APPLICATION = "ticketgo-back-end.wsgi.application"
 
 DATABASES = {
     "default": {
