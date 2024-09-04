@@ -3,7 +3,7 @@ import requests
 import logging
 
 from requests import HTTPError
-from apps.tickets.views import TicketEmailService, TicketsViewSet
+from apps.tickets.views import TicketEmailService
 from dotenv import load_dotenv
 from functools import partialmethod
 
