@@ -3,6 +3,7 @@ import requests
 import logging
 
 from requests import HTTPError
+from apps.tickets.views import TicketEmailService, TicketsViewSet
 from dotenv import load_dotenv
 from functools import partialmethod
 
@@ -32,6 +33,7 @@ class AssasPaymentClient:
             "accept": "application/json",
             "content-type": "application/json",
         }
+        self.email_service = TicketEmailService()
 
     def _request(self, method, url, **kwargs):
         response = requests.request(
@@ -89,12 +91,26 @@ class AssasPaymentClient:
         response = self._api_get("/payments")
         all_payments = response["data"]
         print("check_payment_status running...")
+
         for payment in all_payments:
             try:
                 existing_payment = CartPayment.objects.get(external_id=payment["id"])
+                old_payment_status = existing_payment.status
                 existing_payment.status = payment["status"]
                 existing_payment.payment_type = payment["billingType"]
                 existing_payment.save()
+
+                if payment["status"] == "RECEIVED" and old_payment_status != "RECEIVED":
+                    all_tickets = existing_payment.linked_card_payments.all()
+                    for ticket in all_tickets:
+                        try:
+                            self.email_service.trigger_ticket_email(
+                                ticket.event.uuid, ticket.uuid
+                            )
+                        except Exception as e:
+                            print(
+                                f"Erro ao enviar e-mail para o ticket {ticket.uuid}: {e}"
+                            )
             except CartPayment.DoesNotExist:
                 pass
 
@@ -109,7 +125,7 @@ logger = logging.getLogger(__name__)
 
 def start():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(client.check_payment_status, "interval", minutes=5)
+    scheduler.add_job(client.check_payment_status, "interval", minutes=10)
     try:
         scheduler.start()
         logger.info("Scheduler started!")

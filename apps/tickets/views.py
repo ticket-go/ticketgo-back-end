@@ -17,6 +17,72 @@ from apps.tickets.models import Ticket
 from apps.tickets.serializers import TicketSerializer, VerifyTicketSerializer
 
 
+class TicketEmailService:
+
+    def trigger_ticket_email(self, event_uuid, uuid):
+        try:
+            ticket = Ticket.objects.get(event__uuid=event_uuid, uuid=uuid)
+            qr_img_bytes = self.generate_qr_code(ticket.hash)
+            self.send_email_with_attachment(ticket, qr_img_bytes)
+            print("Email enviado com sucesso!")
+        except Ticket.DoesNotExist:
+            raise Exception("Ticket não encontrado")
+
+    def generate_qr_code(self, data):
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(data)
+        qr.make(fit=True)
+        qr_img = qr.make_image(fill="black", back_color="white")
+
+        qr_img_bytes = BytesIO()
+        qr_img.save(qr_img_bytes)
+        qr_img_bytes.seek(0)
+        return qr_img_bytes
+
+    def send_email_with_attachment(self, ticket, attachment):
+        subject = "Seu ingresso está pronto! - TicketGO"
+        message = f"""
+        <html>
+        <body>
+            <h1>Olá, <strong>{ticket.user.username}</strong>!</h1>
+            
+            <p>Segue seu ingresso referente ao evento <strong>{ticket.event.name}</strong></p>
+
+            <h3><strong>Detalhes do evento:</strong></h3>
+            <ul>
+                <li><strong>Data:</strong> {ticket.event.date}</li>
+                <li><strong>Horário:</strong> {ticket.event.time}</li>
+                <li><strong>Endereço:</strong> {ticket.event.address}</li>
+            </ul>
+            
+            <h3><strong>Detalhes do ingresso:</strong></h3>
+            <ul>
+                <li><strong>ID:</strong> {ticket.uuid}</li>
+                <li><strong>Valor:</strong> R${ticket.cart_payment.value}</li>
+                <li><strong>Data de compra:</strong> {ticket.cart_payment.created_at}</li>
+            </ul>
+            
+            <p>Anexado a este email, você encontrará o ingresso com o <strong>código QR</strong> que deverá ser apresentado na entrada do evento.</p>
+            <p>Agradecemos pela sua compra e esperamos que você aproveite o evento!</p>
+
+            <p>Atenciosamente,<br>
+            Equipe <strong>TicketGO!</strong></p>
+        </body>
+        </html>
+        """
+        email = EmailMessage(
+            subject, message, os.getenv("EMAIL_HOST_USER"), [ticket.user.email]
+        )
+        email.content_subtype = "html"
+        email.attach("ticket_qr.png", attachment.read(), "image/png")
+        email.send()
+
+
 @extend_schema(
     parameters=[
         OpenApiParameter(
@@ -27,7 +93,7 @@ from apps.tickets.serializers import TicketSerializer, VerifyTicketSerializer
         ),
     ]
 )
-class TicketsViewSet(viewsets.ModelViewSet):
+class TicketsViewSet(viewsets.ModelViewSet, TicketEmailService):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     lookup_field = "uuid"
@@ -155,60 +221,6 @@ class TicketsViewSet(viewsets.ModelViewSet):
             return Response({"detail": "E-mail enviado com sucesso."})
         except Exception as e:
             return Response({"error": str(e)}, status=500)
-
-    def generate_qr_code(self, data):
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(data)
-        qr.make(fit=True)
-        qr_img = qr.make_image(fill="black", back_color="white")
-
-        qr_img_bytes = BytesIO()
-        qr_img.save(qr_img_bytes)
-        qr_img_bytes.seek(0)
-        return qr_img_bytes
-
-    def send_email_with_attachment(self, ticket, attachment):
-        subject = "Seu ingresso está pronto! - TicketGO"
-        message = f"""
-        <html>
-        <body>
-            <h1>Olá, <strong>{ticket.user.username}</strong>!</h1>
-            
-            <p>Segue seu ingresso referente ao evento <strong>{ticket.event.name}</strong></p>
-
-            <h3><strong>Detalhes do evento:</strong></h3>
-            <ul>
-                <li><strong>Data:</strong> {ticket.event.date}</li>
-                <li><strong>Horário:</strong> {ticket.event.time}</li>
-                <li><strong>Endereço:</strong> {ticket.event.address}</li>
-            </ul>
-            
-            <h3><strong>Detalhes do ingresso:</strong></h3>
-            <ul>
-                <li><strong>ID:</strong> {ticket.uuid}</li>
-                <li><strong>Valor:</strong> R${ticket.cart_payment.value}</li>
-                <li><strong>Data de compra:</strong> {ticket.cart_payment.created_at}</li>
-            </ul>
-            
-            <p>Anexado a este email, você encontrará o ingresso com o <strong>código QR</strong> que deverá ser apresentado na entrada do evento.</p>
-            <p>Agradecemos pela sua compra e esperamos que você aproveite o evento!</p>
-
-            <p>Atenciosamente,<br>
-            Equipe <strong>TicketGO!</strong></p>
-        </body>
-        </html>
-        """
-        email = EmailMessage(
-            subject, message, os.getenv("EMAIL_HOST_USER"), [ticket.user.email]
-        )
-        email.content_subtype = "html"
-        email.attach("ticket_qr.png", attachment.read(), "image/png")
-        email.send()
 
 
 class VerifyTicketViewSet(generics.UpdateAPIView):
