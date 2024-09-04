@@ -125,7 +125,7 @@ logger = logging.getLogger(__name__)
 
 def start():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(client.check_payment_status, "interval", minutes=10)
+    scheduler.add_job(client.check_payment_status, "interval", minutes=5)
     try:
         scheduler.start()
         logger.info("Scheduler started!")

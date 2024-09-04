@@ -93,7 +93,7 @@ class TicketEmailService:
         ),
     ]
 )
-class TicketsViewSet(viewsets.ModelViewSet, TicketEmailService):
+class TicketsViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     lookup_field = "uuid"
@@ -206,21 +206,6 @@ class TicketsViewSet(viewsets.ModelViewSet, TicketEmailService):
         self.perform_destroy(instance)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @action(
-        methods=["get"],
-        detail=True,
-        url_path="send-ticket-email",
-        url_name="send_ticket_email",
-    )
-    def send_ticket_to_user_email(self, request, event_uuid=None, uuid=None):
-        try:
-            ticket = self.get_object()
-            qr_img_bytes = self.generate_qr_code(ticket.hash)
-            self.send_email_with_attachment(ticket, qr_img_bytes)
-            return Response({"detail": "E-mail enviado com sucesso."})
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
 
 
 class VerifyTicketViewSet(generics.UpdateAPIView):
