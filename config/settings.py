@@ -19,6 +19,7 @@ ALLOWED_HOSTS = [
     "ticketgo-backend-dev.onrender.com",
     "10.0.2.2",  # IP do emulador Android
     env("IP_LOCAL"),  # IP local da sua máquina
+    env("IP_PROD"),  # IP prod
 ]
 
 
@@ -145,17 +146,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Static
 
-STATIC_URL = "apps/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "apps/static/assets")
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATIC_ROOT = os.path.join(BASE_DIR, "apps/static/assets")
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATIC_URL = "/static/"
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "apps/static"),
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 # Media
