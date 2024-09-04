@@ -10,7 +10,7 @@ from apps.users.models import CustomUser
 class CartPayment(BaseModel):
     PAYMENT_STATUS_CHOICES = (
         ("PENDING", _("Pendente")),
-        ("CONFIRMED", _("Confirmado")),
+        ("RECEIVED", _("Recebido")),
     )
 
     external_id = models.CharField(

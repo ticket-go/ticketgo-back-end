@@ -88,7 +88,7 @@ class AssasPaymentClient:
     def check_payment_status(self):
         response = self._api_get("/payments")
         all_payments = response["data"]
-        print("deu certo")
+        print("check_payment_status running...")
         for payment in all_payments:
             try:
                 existing_payment = CartPayment.objects.get(external_id=payment["id"])

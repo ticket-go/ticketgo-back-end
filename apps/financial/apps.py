@@ -1,3 +1,4 @@
+import os
 from django.apps import AppConfig
 
 
@@ -6,6 +7,7 @@ class FinancialConfig(AppConfig):
     name = "apps.financial"
 
     def ready(self):
-        from apps.financial import asaas
-
-        asaas.start()
+        if os.environ.get('RUN_MAIN') != 'true':
+            from apps.financial import asaas
+            print('APscheduler running...')
+            asaas.start()
