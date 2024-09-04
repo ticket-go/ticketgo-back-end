@@ -1,12 +1,12 @@
 import os
 import requests
-import schedule
-import threading
-import time
+import logging
 
 from requests import HTTPError
 from dotenv import load_dotenv
 from functools import partialmethod
+
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from apps.financial.models import CartPayment
 from .serializers import AsaasCustomerSerializer
@@ -88,6 +88,7 @@ class AssasPaymentClient:
     def check_payment_status(self):
         response = self._api_get("/payments")
         all_payments = response["data"]
+        print("deu certo")
         for payment in all_payments:
             try:
                 existing_payment = CartPayment.objects.get(external_id=payment["id"])
@@ -98,24 +99,19 @@ class AssasPaymentClient:
                 pass
 
 
-# # polling status check payments
+# polling status check payments
 
-# client = AssasPaymentClient()
-
-
-# def check_payments():
-#     schedule.every(1).minutes.do(client.check_payment_status)
+client = AssasPaymentClient()
 
 
-# check_payments()
+logger = logging.getLogger(__name__)
 
 
-# # to run in the background
-# def schedule_thread():
-#     while True:
-#         schedule.run_pending()
-#         time.sleep(1)
-
-
-# # config to run in the background
-# threading.Thread(target=schedule_thread).start()
+def start():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(client.check_payment_status, "interval", minutes=5)
+    try:
+        scheduler.start()
+        logger.info("Scheduler started!")
+    except Exception as e:
+        logger.error(f"Scheduler error: {e}")
