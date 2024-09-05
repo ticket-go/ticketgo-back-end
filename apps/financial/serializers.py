@@ -35,7 +35,7 @@ class CartPaymentSerializer(serializers.ModelSerializer):
         return CustomUserSerializer(obj.user).data
 
     def get_tickets(self, obj):
-        uuid_tickets = obj.linked_card_payments.values_list("uuid", flat=True)
+        uuid_tickets = obj.tickets.values_list("uuid", flat=True)
         return uuid_tickets
 
     def create(self, validated_data):

@@ -57,4 +57,4 @@ class CartPayment(BaseModel):
         return self.user.username + " - " + str(self.value)
 
     def get_total_value(self):
-        return sum(ticket.event.ticket_value for ticket in self.linked_payments.all())
+        return sum(ticket.event.ticket_value for ticket in self.tickets.all())

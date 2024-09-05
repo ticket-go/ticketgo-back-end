@@ -126,6 +126,28 @@ class TicketsViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
+    @action(
+        methods=["get"],
+        detail=False,
+        url_path="confirmed",
+        url_name="confirmed",
+    )
+    def list_confirmed_tickets(self, request, event_uuid=None):
+        try:
+            event = Event.objects.get(uuid=event_uuid)
+            confirmed_tickets = event.tickets.filter(cart_payment__status="RECEIVED")
+            serializer = TicketSerializer(confirmed_tickets, many=True)
+            return Response(serializer.data)
+        except Event.DoesNotExist:
+            return Response(
+                {"error": "Evento não encontrado."}, status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": "Ocorreu um erro inesperado. " + str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
     def create(self, request, *args, **kwargs):
         event = self.get_event()
 
