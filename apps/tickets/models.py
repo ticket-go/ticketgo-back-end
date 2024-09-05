@@ -16,19 +16,19 @@ class Ticket(BaseModel):
     event = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,
-        related_name="linked_event",
+        related_name="tickets",
         verbose_name=_("Evento"),
     )
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.PROTECT,
-        related_name="linked_user",
+        related_name="tickets",
         verbose_name=_("Usuário"),
     )
     cart_payment = models.ForeignKey(
         CartPayment,
         on_delete=models.CASCADE,
-        related_name="linked_card_payments",
+        related_name="tickets",
         verbose_name=_("Compra"),
         null=True,
     )

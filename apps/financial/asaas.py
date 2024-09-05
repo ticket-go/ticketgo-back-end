@@ -101,7 +101,7 @@ class AssasPaymentClient:
                 existing_payment.save()
 
                 if payment["status"] == "RECEIVED" and old_payment_status != "RECEIVED":
-                    all_tickets = existing_payment.linked_card_payments.all()
+                    all_tickets = existing_payment.tickets.all()
                     for ticket in all_tickets:
                         try:
                             self.email_service.trigger_ticket_email(

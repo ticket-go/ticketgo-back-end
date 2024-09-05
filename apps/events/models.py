@@ -136,4 +136,4 @@ class Event(BaseModel):
 
     @property
     def tickets_verified(self):
-        return self.linked_event.filter(verified=True).count()
+        return self.tickets.filter(verified=True).count()
