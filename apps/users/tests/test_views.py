@@ -213,3 +213,18 @@ class TestUserViews:
 
         assert response.status_code == 200
         assert len(response.data) > 0  
+    
+
+    def test_retrieve_user_success(self):
+
+        user = self.create_user(unique=True)  
+
+        token = self.test_login_user_success() 
+
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+        response = self.client.get(reverse('user-detail', args=[user.user_id]), format='json')
+        
+
+        assert response.status_code == 200
+        assert response.data["username"] == user.username
