@@ -10,6 +10,7 @@ class TestUserViews:
     email = "michael@michael.com"
     password = "michael"
     cpf = "12345678909"
+    new_email = "michaelmichael@michael.com"
 
     def setup_method(self):
         
@@ -123,3 +124,25 @@ class TestUserViews:
 
             assert login_response.status_code == 200
             assert "access_token" in login_response.data
+    
+    def test_change_email_success(self):
+       
+        token = self.test_login_user_success()
+
+        
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+  
+        user_id = CustomUser.objects.get(username=self.username).user_id
+        change_email_data = {
+            "email": self.new_email
+        }
+
+     
+        response = self.client.put(reverse('user-detail', args=[user_id]), change_email_data, format='json')
+
+       
+        assert response.status_code == 200
+
+        updated_user = CustomUser.objects.get(username=self.username)
+        assert updated_user.email == self.new_email
