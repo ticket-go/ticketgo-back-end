@@ -228,3 +228,16 @@ class TestUserViews:
 
         assert response.status_code == 200
         assert response.data["username"] == user.username
+
+
+    def test_user_history_success(self):
+
+        user = self.create_user(unique=True) 
+        
+        token = self.test_login_user_success() 
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+        response = self.client.get(reverse('user-history'), format='json')
+
+        assert response.status_code == 200
+        assert isinstance(response.data, list)
