@@ -3,51 +3,57 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 from apps.users.models import CustomUser
 
-username = "michael"
-email = "michael@michael.com"
-password = "michael"
-cpf = "12345678909"
-
-
 @pytest.mark.django_db
-def test_create_user():
-    client = APIClient()
+class TestUserViews:
+    username = "michael"
+    email = "michael@michael.com"
+    password = "michael"
+    cpf = "12345678909"
+
+    def setup_method(self):
+        
+        self.client = APIClient()
+
+    def create_user(self):
+        
+        return CustomUser.objects.create_user(
+            username=self.username,
+            email=self.email,
+            password=self.password,
+            cpf=self.cpf
+        )
+
+    def test_create_user(self):
+        user_data = {
+            "username": self.username,
+            "email": self.email,
+            "password": self.password,
+            "cpf": self.cpf
+        }
+
+       
+        response = self.client.post(reverse('user-list'), user_data, format='json')
+
+   
+        assert response.status_code == 201
+        assert CustomUser.objects.filter(username=self.username).exists()
+
+        expected_message = f"O usuário {CustomUser.objects.get(username=self.username).user_id} - {self.username} foi registrado com sucesso."
+        assert response.data["TicketGo"] == expected_message
+
+    def test_login_user_fail(self):
     
-    user_data = {
-        "username": username,
-        "email": email,
-        "password": password,
-        "cpf": cpf
-    }
- 
-    response = client.post(reverse('user-list'), user_data, format='json')
+        self.create_user()
 
-    assert response.status_code == 201
-    assert CustomUser.objects.filter(username=username).exists()
+      
+        login_data = {
+            "username": self.username,
+            "password": "michael1"  
+        }
 
-    assert "TicketGo" in response.data
-    expected_message = f"O usuário {CustomUser.objects.get(username=username).user_id} - {username} foi registrado com sucesso."
-    assert response.data["TicketGo"] == expected_message
+      
+        response = self.client.post(reverse('login'), login_data, format='json')
 
-
-@pytest.mark.django_db
-def test_login_user_fail():
-    client = APIClient()
-
-    CustomUser.objects.create_user(
-        username=username, 
-        email=email, 
-        password=password, 
-        cpf=cpf
-    )
-
-    login_data = {
-        "username": username,
-        "password": "michael1"
-    }
-
-    response = client.post(reverse('login'), login_data, format='json')
-
-    assert response.status_code == 401
-    assert "access_token" not in response.data
-    assert "refresh_token" not in response.data
+        assert response.status_code == 401
+        assert "access_token" not in response.data
+        assert "refresh_token" not in response.data
