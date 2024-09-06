@@ -2,6 +2,7 @@ import pytest
 from rest_framework.test import APIClient
 from django.urls import reverse
 from apps.users.models import CustomUser
+from rest_framework_simplejwt.tokens import RefreshToken
 
 @pytest.mark.django_db
 class TestUserViews:
@@ -74,3 +75,19 @@ class TestUserViews:
         assert "access_token" in response.data
         assert "refresh_token" in response.data
         assert response.data["user"]["username"] == self.username
+        return response.data['access_token']
+
+    
+    def test_logout_user_success(self):
+   
+        token = self.test_login_user_success()
+
+        
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+ 
+        response = self.client.post(reverse('logout'))
+
+  
+        assert response.status_code == 200
+        assert response.data["message"] == "Você foi desconectado com sucesso."
