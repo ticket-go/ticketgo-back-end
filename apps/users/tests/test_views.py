@@ -179,3 +179,24 @@ class TestUserViews:
 
         user.refresh_from_db()
         assert user.is_active == False
+
+    def test_partial_update_user_success(self):
+
+        user = self.create_user(unique=True)  
+
+        token = self.test_login_user_success()  
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+        user_id = user.user_id
+        partial_update_data = {
+            "first_name": "César"
+        }
+
+        response = self.client.patch(reverse('user-detail', args=[user_id]), partial_update_data, format='json')
+
+        assert response.status_code == 200
+        assert response.data["first_name"] == "César"
+
+        updated_user = CustomUser.objects.get(user_id=user_id)
+        assert updated_user.first_name == "César"
+
