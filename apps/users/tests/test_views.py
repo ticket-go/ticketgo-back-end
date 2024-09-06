@@ -200,3 +200,16 @@ class TestUserViews:
         updated_user = CustomUser.objects.get(user_id=user_id)
         assert updated_user.first_name == "César"
 
+
+    def test_list_users_success(self):
+
+        self.create_user(unique=True)
+
+        token = self.test_login_user_success() 
+
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+        response = self.client.get(reverse('user-list'), format='json')
+
+        assert response.status_code == 200
+        assert len(response.data) > 0  
