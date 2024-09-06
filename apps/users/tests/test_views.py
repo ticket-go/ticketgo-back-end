@@ -141,4 +141,19 @@ class TestUserViews:
         assert "refresh_token" in response.data
         assert response.data["user"]["username"] == self.username
 
+    def test_login_mobile_no_permission(self):
+       
+        self.create_user(privileged=False)
+
+        login_data = {
+            "username": self.username,
+            "password": self.password
+        }
+
+        response = self.client.post(reverse('login-mobile'), login_data, format='json')
+
+        assert response.status_code == 401
+        assert "access_token" not in response.data
+        assert "refresh_token" not in response.data
+        assert response.data["error"] == "O usuário não tem permissão para acessar está aplicação."
 
