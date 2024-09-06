@@ -233,11 +233,35 @@ class TestUserViews:
     def test_user_history_success(self):
 
         user = self.create_user(unique=True) 
-        
+
         token = self.test_login_user_success() 
+
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         response = self.client.get(reverse('user-history'), format='json')
 
         assert response.status_code == 200
         assert isinstance(response.data, list)
+
+    
+    def test_change_email_already_exists(self):
+
+        existing_user = CustomUser.objects.create_user(
+            username="email",
+            email="michael@michael.com",
+            password=self.password,
+            cpf="12345678901"
+        )
+
+        token = self.test_login_user_success()
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+        user_id = CustomUser.objects.get(username=self.username).user_id
+        change_email_data = {
+            "email": "michael@michael.com"  
+        }
+
+        response = self.client.put(reverse('user-detail', args=[user_id]), change_email_data, format='json')
+
+        assert response.status_code == 400 
+        assert "Este endereço de e-mail já está em uso" in response.data["error"]
