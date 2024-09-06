@@ -49,7 +49,7 @@ class TestUserViews:
 
         login_data = {
             "username": self.username,
-            "password": "michael1"  
+            "password": "michael1"
         }
 
         response = self.client.post(reverse('login'), login_data, format='json')
@@ -155,5 +155,5 @@ class TestUserViews:
         assert response.status_code == 401
         assert "access_token" not in response.data
         assert "refresh_token" not in response.data
-        assert response.data["error"] == "O usuário não tem permissão para acessar está aplicação."
+        assert response.data["error"] == "User does not have permission to access this application"
 
