@@ -57,3 +57,20 @@ class TestUserViews:
         assert response.status_code == 401
         assert "access_token" not in response.data
         assert "refresh_token" not in response.data
+
+
+    def test_login_user_success(self):
+      
+        self.create_user()
+
+        login_data = {
+            "username": self.username,
+            "password": self.password 
+        }
+
+        response = self.client.post(reverse('login'), login_data, format='json')
+
+        assert response.status_code == 200
+        assert "access_token" in response.data
+        assert "refresh_token" in response.data
+        assert response.data["user"]["username"] == self.username
