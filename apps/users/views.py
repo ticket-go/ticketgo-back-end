@@ -83,13 +83,13 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        
-        instance.is_active = False
-        instance.save()
+
+        user = self.get_object()
+        user.is_active = False  
+        user.save()
         return Response(
-            {"message": f"O usuário {instance.username} foi desativado com sucesso."},
-            status=status.HTTP_200_OK,
+            {"message": f"O usuário {user.username} foi desativado com sucesso."},
+            status=status.HTTP_200_OK
         )
 
     @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])

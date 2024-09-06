@@ -2,6 +2,7 @@ import pytest
 from rest_framework.test import APIClient
 from django.urls import reverse
 from apps.users.models import CustomUser
+import uuid
 
 #SRP
 
@@ -17,10 +18,14 @@ class TestUserViews:
     def setup_method(self):
         self.client = APIClient()
 
-    def create_user(self, privileged=False):
-        
+    def create_user(self, privileged=False, unique=False):
+        if unique:
+            username = f"{self.username}_{uuid.uuid4()}" 
+        else:
+            username = self.username
+
         user = CustomUser.objects.create_user(
-            username=self.username,
+            username=username,
             email=self.email,
             password=self.password,
             cpf=self.cpf
@@ -161,22 +166,16 @@ class TestUserViews:
 
 
     def test_delete_user_success(self):
-        # Criar e logar o usuário
-        token = self.test_login_user_success()
-
-        # Adicionar o token na requisição
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
-
-        # Obter o ID do usuário
-        user = CustomUser.objects.get(username=self.username)
+        user = self.create_user(unique=True)  
         user_id = user.user_id
 
-        # Requisição DELETE para excluir o usuário
+        token = self.test_login_user_success() 
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
         response = self.client.delete(reverse('user-detail', args=[user_id]))
 
-        # Verificar se a exclusão foi bem-sucedida
         assert response.status_code == 200
-        assert response.data["message"] == f"O usuário {self.username} foi deletado com sucesso."
+        assert response.data["message"] == f"O usuário {user.username} foi desativado com sucesso."
 
-        # Verificar se o usuário foi removido do banco de dados
-        assert not CustomUser.objects.filter(username=self.username).exists()
+        user.refresh_from_db()
+        assert user.is_active == False
