@@ -91,3 +91,35 @@ class TestUserViews:
   
         assert response.status_code == 200
         assert response.data["message"] == "Você foi desconectado com sucesso."
+
+
+
+    def test_change_password_success(self):
+            
+            token = self.test_login_user_success()
+
+            self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+            change_password_data = {
+                "old_password": self.password,
+                "new_password": "michael2",
+                "confirm_new_password": "michael2"
+            }
+
+    
+            response = self.client.put(reverse('change-password', args=[self.username]), change_password_data, format='json')
+
+    
+            assert response.status_code == 200
+            assert response.data["detail"] == "Senha alterada com sucesso."
+
+
+            login_data = {
+                "username": self.username,
+                "password": "michael2"
+            }
+
+            login_response = self.client.post(reverse('login'), login_data, format='json')
+
+            assert login_response.status_code == 200
+            assert "access_token" in login_response.data
