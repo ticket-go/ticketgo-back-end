@@ -3,6 +3,8 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 from apps.users.models import CustomUser
 
+#SRP
+
 @pytest.mark.django_db
 class TestUserViews:
     username = "michael"
@@ -157,3 +159,24 @@ class TestUserViews:
         assert "refresh_token" not in response.data
         assert response.data["error"] == "User does not have permission to access this application"
 
+
+    def test_delete_user_success(self):
+        # Criar e logar o usuário
+        token = self.test_login_user_success()
+
+        # Adicionar o token na requisição
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+        # Obter o ID do usuário
+        user = CustomUser.objects.get(username=self.username)
+        user_id = user.user_id
+
+        # Requisição DELETE para excluir o usuário
+        response = self.client.delete(reverse('user-detail', args=[user_id]))
+
+        # Verificar se a exclusão foi bem-sucedida
+        assert response.status_code == 200
+        assert response.data["message"] == f"O usuário {self.username} foi deletado com sucesso."
+
+        # Verificar se o usuário foi removido do banco de dados
+        assert not CustomUser.objects.filter(username=self.username).exists()

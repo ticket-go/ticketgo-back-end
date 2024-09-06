@@ -22,7 +22,7 @@ CustomUser = get_user_model()
 
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CustomUserSerializer
-    queryset = CustomUser.objects.all()
+    queryset = CustomUser.objects.filter(is_active=True)
     lookup_field = "user_id"
     permission_classes = [AllowCreateOnly]
 
@@ -84,9 +84,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        self.perform_destroy(instance)
+        
+        instance.is_active = False
+        instance.save()
         return Response(
-            {"message": f"O usuário {instance.username} foi deletado com sucesso."},
+            {"message": f"O usuário {instance.username} foi desativado com sucesso."},
             status=status.HTTP_200_OK,
         )
 
