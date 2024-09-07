@@ -256,3 +256,28 @@ class TestEventViews:
         assert response.status_code == 400
         assert "ticket_quantity" in response.data
 
+
+    def test_delete_event_by_another_user(self):
+       
+        another_user = CustomUser.objects.create_user(
+            username="anotheruser",
+            email="anotheruser@test.com",
+            password="anotherpassword"
+        )
+        
+       
+        event = self.create_event()
+       
+        login_data = {
+            "username": "anotheruser",
+            "password": "anotherpassword"
+        }
+        response = self.client.post(reverse('login'), login_data, format='json')
+        token = response.data['access_token']
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+   
+        response = self.client.delete(reverse('event-detail', args=[event.uuid]))
+        
+        assert response.status_code == 403  
+ 
+
