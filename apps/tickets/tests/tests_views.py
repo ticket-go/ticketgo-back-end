@@ -14,22 +14,22 @@ class TestTicketViews:
     def setup_method(self):
         self.client = APIClient()
 
-        # Criação de um usuário
+      
         self.user = CustomUser.objects.create_user(
-            username="testuser",
-            email="testuser@test.com",
-            password="testpassword"
+            username="michael",
+            email="michael@michael.com",
+            password="michael"
         )
 
         login_data = {
-            "username": "testuser",
-            "password": "testpassword"
+            "username": "michael",
+            "password": "michael"
         }
         response = self.client.post(reverse('login'), login_data, format='json')
         token = response.data['access_token']
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
-        # Criação de um endereço
+    
         self.address = Address.objects.create(
             street="Rua 1",
             number=123,
@@ -40,7 +40,7 @@ class TestTicketViews:
             zip_code="59600-000"
         )
 
-        # Criação de um evento
+      
         self.event = Event.objects.create(
             name="Festival de Música",
             date=date.today(),
@@ -55,11 +55,11 @@ class TestTicketViews:
             tickets_sold=0,
             tickets_available=100,
             half_tickets_available=50,
-            address=self.address,  # Adicionando o endereço ao evento
+            address=self.address,  
             user=self.user,
         )
 
-        # Criação de um pagamento
+       
         self.payment = CartPayment.objects.create(
             value=0,
             status="PENDING",
@@ -67,16 +67,13 @@ class TestTicketViews:
         )
 
     def test_create_ticket_full(self):
-        """
-        Teste para garantir que a criação de um ingresso inteira funcione corretamente.
-        """
+       
         ticket_data = {
             "half_ticket": False,
             "cart_payment": str(self.payment.uuid),
         }
 
-        # Criar ingresso associando ao evento e ao pagamento
-        response = self.client.post(reverse('tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
 
         assert response.status_code == 201
         ticket = Ticket.objects.get(event=self.event)
@@ -86,7 +83,7 @@ class TestTicketViews:
         assert ticket.cart_payment == self.payment
         assert ticket.half_ticket == False
 
-        # Verificar se a contagem de ingressos disponíveis foi atualizada corretamente
         self.event.refresh_from_db()
         assert self.event.tickets_available == 99
         assert self.event.tickets_sold == 1
+
