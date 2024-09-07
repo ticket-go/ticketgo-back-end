@@ -208,7 +208,7 @@ class TestEventViews:
 
 
     def test_filter_events_by_category(self):
-        
+
         event1 = self.create_event()
         
         event2_data = {
@@ -232,3 +232,27 @@ class TestEventViews:
         assert response.status_code == 200
         assert len(response.data) == 1
         assert response.data[0]["category"] == "conference"
+    
+
+    def test_event_invalid_ticket_quantity(self):
+
+        event_data = {
+            "name": "Festival com Ingressos Inválidos",
+            "date": date.today(),
+            "time": time(18, 0),
+            "description": "Evento com quantidade inválida de ingressos.",
+            "category": "music",
+            "status": "scheduled",
+            "ticket_value": 100.00,
+            "half_ticket_value": 50.00,
+            "ticket_quantity": -10,  
+            "half_ticket_quantity": 50,
+            "address": str(self.address.uuid),
+            "user": self.user.user_id
+        }
+
+        response = self.client.post(reverse('event-list'), event_data, format='json')
+
+        assert response.status_code == 400
+        assert "ticket_quantity" in response.data
+
