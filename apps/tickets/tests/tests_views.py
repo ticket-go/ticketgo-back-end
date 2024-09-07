@@ -311,3 +311,18 @@ class TestTicketViews:
         response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
 
         assert response.status_code == 400  
+
+
+    def test_create_ticket_for_future(self):
+       
+        self.event.date = date.today().replace(year=2025)
+        self.event.save()
+
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+
+        assert response.status_code == 201 
