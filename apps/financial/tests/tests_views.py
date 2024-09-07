@@ -82,3 +82,19 @@ class TestCartPaymentsViewSet:
         
         assert response.status_code == 200
 
+
+
+    def test_list_cart_payments_filter(self):
+     
+        CartPayment.objects.create(value=100.00, payment_type="CARD", status="PENDING", user=self.user)
+        CartPayment.objects.create(value=200.00, payment_type="CARD", status="RECEIVED", user=self.user)
+
+      
+        response = self.client.get(reverse('cartpayment-list'), {'status': 'RECEIVED', 'user': str(self.user.user_id)}, format='json')
+        
+     
+        assert response.status_code == 200
+        
+        
+        assert len(response.data) == 1
+        assert response.data[0]['status'] == 'RECEIVED'
