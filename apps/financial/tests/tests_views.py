@@ -108,3 +108,4 @@ class TestCartPaymentsViewSet:
 
         response = self.client.get(reverse('cartpayment-detail', args=[invalid_hash]))
         assert response.status_code == 404
+
