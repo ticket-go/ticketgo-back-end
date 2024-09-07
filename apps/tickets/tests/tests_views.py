@@ -118,3 +118,25 @@ class TestTicketViews:
         
         with pytest.raises(Ticket.DoesNotExist):
             Ticket.objects.get(uuid=ticket_uuid)
+
+    
+    def test_verify_ticket(self):
+        
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+
+   
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+        ticket_uuid = response.data['uuid']
+        ticket = Ticket.objects.get(uuid=ticket_uuid)
+
+     
+        verify_data = {"hash": ticket.hash}
+        response = self.client.patch(reverse('verify_ticket', args=[self.event.uuid]), verify_data, format='json')
+
+        assert response.status_code == 200
+
+        ticket.refresh_from_db()
+        assert ticket.verified is True
