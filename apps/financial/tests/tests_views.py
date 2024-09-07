@@ -109,3 +109,14 @@ class TestCartPaymentsViewSet:
         response = self.client.get(reverse('cartpayment-detail', args=[invalid_hash]))
         assert response.status_code == 404
 
+
+    def test_create_cart_payment_invalid_data(self):
+
+        payment_data = {
+            "value": -50.00,  
+            "payment_type": "INVALID",  
+            "user": str(self.user.user_id)
+        }
+
+        response = self.client.post(reverse('cartpayment-list'), payment_data, format='json')
+        assert response.status_code == 400
