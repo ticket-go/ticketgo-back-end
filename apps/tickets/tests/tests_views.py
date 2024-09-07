@@ -53,7 +53,7 @@ class TestTicketViews:
             half_ticket_value=50.00,
             ticket_quantity=100,
             half_ticket_quantity=100,
-            tickets_sold=25,
+            tickets_sold=0,
             tickets_available=100,
             half_tickets_available=25,
             address=self.address,  
@@ -91,7 +91,7 @@ class TestTicketViews:
     
     def test_create_ticket_no_availability(self):
         
-        #Observação: A disponibilidade do ingresso é baseada no número de ingressos vendidos e não disponíveis.
+        
         self.event.tickets_sold = 100
         self.event.tickets_available = 0
         self.event.save()
@@ -129,7 +129,7 @@ class TestTicketViews:
         assert ticket.cart_payment == self.payment
 
         self.event.refresh_from_db()
-        assert self.event.half_tickets_available == 49
+        assert self.event.half_tickets_available == 24
         assert self.event.tickets_sold == 1
 
 
@@ -282,3 +282,21 @@ class TestTicketViews:
 
         assert response.status_code == 409
         assert response.data['message'] == "Este ingresso já foi verificado. Por favor, verifique outro ingresso ou entre em contato com o suporte se você achar que isso é um erro."
+    
+
+    def test_cancel_ticket_updates_event(self):
+      
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+        ticket_uuid = response.data['uuid']
+
+    
+        response = self.client.delete(reverse('event-tickets-detail', args=[self.event.uuid, ticket_uuid]))
+        assert response.status_code == 204
+
+       
+        self.event.refresh_from_db()
+        assert self.event.tickets_available == 100  
