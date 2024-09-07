@@ -371,3 +371,25 @@ class TestTicketViews:
         verify_data = {"hash": "invalidhash"}
         response = self.client.patch(reverse('verify_ticket', args=[self.event.uuid]), verify_data, format='json')
         assert response.status_code == 404
+
+
+    #necessário ajuste
+    def test_cancelled_payment(self):
+
+        self.payment.status = "CANCELLED"
+        self.payment.save()
+
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+        assert response.status_code == 400
+        assert "Pagamento cancelado" in response.data['error']
+
+
+    def test_confirmed_tickets_empty(self):
+        response = self.client.get(reverse('event-tickets-confirmed', args=[self.event.uuid]))
+        assert response.status_code == 200
+        assert len(response.data) == 0
