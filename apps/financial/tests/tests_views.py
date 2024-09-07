@@ -34,7 +34,7 @@ class TestCartPaymentsViewSet:
         self.client.force_authenticate(user=self.user)
         
 
-
+        
     def test_create_cart_payment(self):
         payment_data = {
             "value": 100.00,
@@ -62,3 +62,22 @@ class TestCartPaymentsViewSet:
 
 
 
+    def test_generate_invoice(self):
+    
+        payment = CartPayment.objects.create(
+            value=150.00,
+            payment_type="CARD",
+            user=self.user
+        )
+
+        invoice_data = {
+            "cart_payment": str(payment.uuid),
+        }
+
+     
+        response = self.client.post(reverse('generate_invoices'), invoice_data, format='json')
+
+        if response.status_code != 200:
+            print("Response data:", response.data)
+        
+        assert response.status_code == 200
