@@ -114,11 +114,21 @@ class Event(BaseModel):
         verbose_name = _("Evento")
         verbose_name_plural = _("Eventos")
 
+
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.tickets_available = self.ticket_quantity
+        if self.half_tickets_available is None:
             self.half_tickets_available = self.half_ticket_quantity
+
+        if self.tickets_available is None:
+            self.tickets_available = self.ticket_quantity - self.tickets_sold
+
+        self.half_tickets_available = max(0, self.half_ticket_quantity - self.half_tickets_sold)
+
         super().save(*args, **kwargs)
+
+    @property
+    def half_tickets_sold(self):
+        return self.half_ticket_quantity - (self.half_tickets_available or 0)
 
     def __str__(self):
         return self.name

@@ -113,6 +113,25 @@ class TestEventViews:
         assert updated_event.time == time(20, 0)
         assert updated_event.ticket_value == 150.00
         assert updated_event.ticket_quantity == 200
+    
+
+    def test_partial_update_event(self):
+       
+        event = self.create_event()
+
+     
+        partial_update_data = {
+            "name": "Festival de Música Atualizado"
+        }
+
+    
+        response = self.client.patch(reverse('event-detail', args=[event.uuid]), partial_update_data, format='json')
+
+  
+        assert response.status_code == 200
+
+   
+        assert response.data["name"] == "Festival de Música Atualizado"
 
 
     
@@ -140,3 +159,35 @@ class TestEventViews:
         assert response.status_code == 200
 
         assert response.data["name"] == event.name
+
+    
+    def test_create_event_invalid_data(self):
+    
+        event_data = {
+            "date": date.today(),
+            "time": time(18, 0),
+            "description": "Um grande festival de música.",
+            "category": "music",
+            "status": "scheduled",
+            "ticket_value": 100.00,
+            "half_ticket_value": 50.00,
+            "ticket_quantity": 100,
+            "half_ticket_quantity": 50,
+            "address": self.address.id,
+            "user": self.user.user_id
+        }
+
+        response = self.client.post(reverse('event-list'), event_data, format='json')
+
+       
+        assert response.status_code == 400
+
+        assert "name" in response.data
+
+
+
+
+    
+
+
+
