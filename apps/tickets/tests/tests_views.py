@@ -101,3 +101,6 @@ class TestTicketViews:
         response = self.client.get(reverse('event-tickets-list', args=[self.event.uuid]))
         assert response.status_code == 200
         assert len(response.data) == 2  
+    
+
+   
