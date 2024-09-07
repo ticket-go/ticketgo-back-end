@@ -241,3 +241,6 @@ class TestTicketViews:
         assert response.status_code == 201
         ticket = Ticket.objects.get(event=self.event)
         assert ticket.cart_payment.status == "PENDING"
+
+
+    

@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404
 from apps.events.models import Event
 from apps.tickets.models import Ticket
 from apps.tickets.serializers import TicketSerializer, VerifyTicketSerializer
+from datetime import date
 
 
 class TicketEmailService:
@@ -150,6 +151,10 @@ class TicketsViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         event = self.get_event()
+
+        if event.date < date.today():
+            message = "Não é possível comprar ingressos para eventos que já ocorreram."
+            return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
