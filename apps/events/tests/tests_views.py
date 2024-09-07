@@ -193,6 +193,16 @@ class TestEventViews:
         assert response.status_code == 404
 
     
+    def test_event_tickets_availability(self):
+        event = self.create_event()
 
+        event.tickets_sold = 50
+        event.tickets_available = event.ticket_quantity - event.tickets_sold 
+        event.save()
+
+        response = self.client.get(reverse('event-detail', args=[event.uuid]))
+
+        assert response.status_code == 200
+        assert response.data["tickets_available"] == event.ticket_quantity - event.tickets_sold
 
 
