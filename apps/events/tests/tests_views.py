@@ -127,3 +127,16 @@ class TestEventViews:
         assert response.status_code == 200
 
         assert len(response.data) == 2
+
+
+    def test_retrieve_event(self):
+        
+        event = self.create_event()
+
+       
+        response = self.client.get(reverse('event-detail', args=[event.uuid]))
+
+        
+        assert response.status_code == 200
+
+        assert response.data["name"] == event.name
