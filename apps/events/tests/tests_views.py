@@ -80,3 +80,36 @@ class TestEventViews:
       
         with pytest.raises(Event.DoesNotExist):
             Event.objects.get(uuid=event.uuid)
+
+
+    def test_update_event(self):
+       
+        event = self.create_event()
+
+      
+        updated_event_data = {
+            "name": "Festival de Rock",
+            "date": date.today(),
+            "time": time(20, 0),
+            "description": "Um grande festival de rock.",
+            "category": "music",
+            "status": "scheduled",
+            "ticket_value": 150.00,
+            "half_ticket_value": 75.00,
+            "ticket_quantity": 200,
+            "half_ticket_quantity": 100,
+            "address": str(self.address.uuid), 
+            "user": self.user.user_id  
+        }
+
+       
+        response = self.client.put(reverse('event-detail', args=[event.uuid]), updated_event_data, format='json')
+
+   
+        assert response.status_code == 200
+
+        updated_event = Event.objects.get(uuid=event.uuid)
+        assert updated_event.name == "Festival de Rock"
+        assert updated_event.time == time(20, 0)
+        assert updated_event.ticket_value == 150.00
+        assert updated_event.ticket_quantity == 200
