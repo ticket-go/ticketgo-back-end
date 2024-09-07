@@ -113,3 +113,17 @@ class TestEventViews:
         assert updated_event.time == time(20, 0)
         assert updated_event.ticket_value == 150.00
         assert updated_event.ticket_quantity == 200
+
+
+    
+    def test_list_events(self):
+        
+        self.create_event()
+        self.create_event()
+
+     
+        response = self.client.get(reverse('event-list'))
+    
+        assert response.status_code == 200
+
+        assert len(response.data) == 2
