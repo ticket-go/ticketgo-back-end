@@ -7,6 +7,7 @@ from apps.address.models import Address
 from apps.financial.models import CartPayment
 from apps.users.models import CustomUser
 from datetime import date, time
+from django.core import mail
 
 @pytest.mark.django_db
 class TestTicketViews:
@@ -223,3 +224,20 @@ class TestTicketViews:
         response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
 
         assert response.status_code == 201
+    
+
+    def test_pending_payment(self):
+        
+        self.payment.status = "PENDING"
+        self.payment.save()
+
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+
+        assert response.status_code == 201
+        ticket = Ticket.objects.get(event=self.event)
+        assert ticket.cart_payment.status == "PENDING"
