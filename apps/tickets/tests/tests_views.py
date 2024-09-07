@@ -17,7 +17,7 @@ class TestTicketViews:
       
         self.user = CustomUser.objects.create_user(
             username="michael",
-            email="michael@michael.com",
+            email="michael.cesar@escolar.ifrn.edu.br",
             password="michael"
         )
 
@@ -92,6 +92,7 @@ class TestTicketViews:
         
         #Observação: A disponibilidade do ingresso é baseada no número de ingressos vendidos e não disponíveis.
         self.event.tickets_sold = 100
+        self.event.tickets_available = 0
         self.event.save()
 
      
@@ -205,3 +206,20 @@ class TestTicketViews:
 
         ticket.refresh_from_db()
         assert ticket.verified is True
+
+
+    def test_email(self, monkeypatch):
+       
+        def mock_send_email_with_attachment(ticket, attachment):
+            pass 
+
+        monkeypatch.setattr('apps.tickets.views.TicketEmailService.send_email_with_attachment', mock_send_email_with_attachment)
+
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+
+        assert response.status_code == 201
