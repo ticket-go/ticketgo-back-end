@@ -328,3 +328,38 @@ class TestTicketViews:
         assert response.status_code == 201 
 
 
+    def test_ticket_qr_code(self):
+     
+        ticket_data_1 = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+
+        response_1 = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data_1, format='json')
+        assert response_1.status_code == 201
+
+    
+        self.payment_2 = CartPayment.objects.create(
+            value=0,
+            status="PENDING",
+            payment_type="CARD"
+        )
+
+        ticket_data_2 = {
+            "half_ticket": True,
+            "cart_payment": str(self.payment_2.uuid),
+        }
+
+        response_2 = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data_2, format='json')
+        assert response_2.status_code == 201
+
+        ticket_1 = Ticket.objects.get(cart_payment=self.payment)
+        ticket_2 = Ticket.objects.get(cart_payment=self.payment_2)
+
+    
+        assert ticket_1.hash is not None
+        assert len(ticket_1.hash) > 0
+        assert ticket_2.hash is not None
+        assert len(ticket_2.hash) > 0
+
+        assert ticket_1.hash != ticket_2.hash
