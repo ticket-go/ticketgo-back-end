@@ -363,3 +363,11 @@ class TestTicketViews:
         assert len(ticket_2.hash) > 0
 
         assert ticket_1.hash != ticket_2.hash
+
+
+
+    def test_invalid_hash(self):
+
+        verify_data = {"hash": "invalidhash"}
+        response = self.client.patch(reverse('verify_ticket', args=[self.event.uuid]), verify_data, format='json')
+        assert response.status_code == 404
