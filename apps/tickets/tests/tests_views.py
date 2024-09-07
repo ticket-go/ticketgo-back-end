@@ -243,4 +243,17 @@ class TestTicketViews:
         assert ticket.cart_payment.status == "PENDING"
 
 
-    
+    def test_create_ticket_after_event(self):
+        
+        self.event.date = date(2020, 1, 1)
+        self.event.save()
+
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+
+        assert response.status_code == 400
+        assert response.data['error'] == 'Não é possível comprar ingressos para eventos que já ocorreram.'
