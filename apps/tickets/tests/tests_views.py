@@ -50,11 +50,11 @@ class TestTicketViews:
             status="scheduled",
             ticket_value=100.00,
             half_ticket_value=50.00,
-            ticket_quantity=100,
-            half_ticket_quantity=50,
+            ticket_quantity=0,
+            half_ticket_quantity=0,
             tickets_sold=0,
-            tickets_available=100,
-            half_tickets_available=50,
+            tickets_available=0,
+            half_tickets_available=0,
             address=self.address,  
             user=self.user,
         )
@@ -86,6 +86,27 @@ class TestTicketViews:
         self.event.refresh_from_db()
         assert self.event.tickets_available == 99
         assert self.event.tickets_sold == 1
+
+    
+    def test_create_ticket_no_availability(self):
+       
+        self.event.tickets_available = 0
+        self.event.save()
+
+     
+        self.event.refresh_from_db()
+
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+
+    
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+
+        assert response.status_code == 400  
+
+
     
     def test_create_half_ticket(self):
         
