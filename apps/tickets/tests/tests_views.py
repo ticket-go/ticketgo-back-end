@@ -103,4 +103,18 @@ class TestTicketViews:
         assert len(response.data) == 2  
     
 
-   
+    def test_delete_ticket(self):
+
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+        ticket_uuid = response.data['uuid']
+
+        response = self.client.delete(reverse('event-tickets-detail', args=[self.event.uuid, ticket_uuid]))
+        assert response.status_code == 204  
+
+        
+        with pytest.raises(Ticket.DoesNotExist):
+            Ticket.objects.get(uuid=ticket_uuid)
