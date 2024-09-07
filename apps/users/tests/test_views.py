@@ -41,7 +41,7 @@ class TestUserViews:
             "privileged": self.privileged
         }
 
-        response = self.client.post(reverse('user-list'), user_data, format='json')
+        response = self.client.post(reverse('customuser-list'), user_data, format='json')
 
         assert response.status_code == 201
         assert CustomUser.objects.filter(username=self.username).exists()
@@ -126,7 +126,7 @@ class TestUserViews:
             "email": self.new_email
         }
 
-        response = self.client.put(reverse('user-detail', args=[user_id]), change_email_data, format='json')
+        response = self.client.put(reverse('customuser-detail', args=[user_id]), change_email_data, format='json')
 
         assert response.status_code == 200
 
@@ -171,7 +171,7 @@ class TestUserViews:
         # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
-        response = self.client.delete(reverse('user-detail', args=[user_id]))
+        response = self.client.delete(reverse('customuser-detail', args=[user_id]))
 
         assert response.status_code == 200
         assert response.data["message"] == f"O usuário {user.username} foi desativado com sucesso."
@@ -188,7 +188,7 @@ class TestUserViews:
         user_id = user.user_id
         partial_update_data = {"first_name": "César"}
 
-        response = self.client.patch(reverse('user-detail', args=[user_id]), partial_update_data, format='json')
+        response = self.client.patch(reverse('customuser-detail', args=[user_id]), partial_update_data, format='json')
 
         assert response.status_code == 200
         assert response.data["first_name"] == "César"
@@ -202,7 +202,7 @@ class TestUserViews:
         # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
-        response = self.client.get(reverse('user-list'), format='json')
+        response = self.client.get(reverse('customuser-list'), format='json')
 
         assert response.status_code == 200
         assert len(response.data) > 0  
@@ -213,7 +213,7 @@ class TestUserViews:
         # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
-        response = self.client.get(reverse('user-detail', args=[user.user_id]), format='json')
+        response = self.client.get(reverse('customuser-detail', args=[user.user_id]), format='json')
         assert response.status_code == 200
         assert response.data["username"] == user.username
 
@@ -223,7 +223,7 @@ class TestUserViews:
         # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
-        response = self.client.get(reverse('user-history'), format='json')
+        response = self.client.get(reverse('customuser-history'), format='json')
 
         assert response.status_code == 200
         assert isinstance(response.data, list)
@@ -243,7 +243,7 @@ class TestUserViews:
         user_id = CustomUser.objects.get(username=self.username).user_id
         change_email_data = {"email": "michael@michael.com"}  
 
-        response = self.client.put(reverse('user-detail', args=[user_id]), change_email_data, format='json')
+        response = self.client.put(reverse('customuser-detail', args=[user_id]), change_email_data, format='json')
 
         assert response.status_code == 400 
         assert "Este endereço de e-mail já está em uso" in response.data["error"]
