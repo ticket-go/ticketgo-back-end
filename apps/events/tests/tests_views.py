@@ -260,17 +260,17 @@ class TestEventViews:
     def test_delete_event_by_another_user(self):
        
         another_user = CustomUser.objects.create_user(
-            username="anotheruser",
-            email="anotheruser@test.com",
-            password="anotherpassword"
+            username="michaelcesar",
+            email="michaelcesar@michaelcesar.com",
+            password="michaelcesar"
         )
         
        
         event = self.create_event()
        
         login_data = {
-            "username": "anotheruser",
-            "password": "anotherpassword"
+            "username": "michaelcesar",
+            "password": "michaelcesar"
         }
         response = self.client.post(reverse('login'), login_data, format='json')
         token = response.data['access_token']
@@ -281,3 +281,14 @@ class TestEventViews:
         assert response.status_code == 403  
  
 
+    def test_exceed_ticket_sales(self):
+        event = self.create_event()
+
+       
+        event.tickets_sold = 120
+        event.save()
+
+        response = self.client.get(reverse('event-detail', args=[event.uuid]))
+
+        assert response.status_code == 200
+        assert response.data["tickets_available"] == 0  
