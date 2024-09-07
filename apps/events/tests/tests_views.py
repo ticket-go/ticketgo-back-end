@@ -206,3 +206,29 @@ class TestEventViews:
         assert response.data["tickets_available"] == event.ticket_quantity - event.tickets_sold
 
 
+
+    def test_filter_events_by_category(self):
+        
+        event1 = self.create_event()
+        
+        event2_data = {
+            "name": "Conferência de Tecnologia",
+            "date": date.today(),
+            "time": time(14, 0),
+            "description": "Uma conferência sobre tecnologia.",
+            "category": "conference",
+            "status": "scheduled",
+            "ticket_value": 200.00,
+            "half_ticket_value": 100.00,
+            "ticket_quantity": 300,
+            "half_ticket_quantity": 150,
+            "address": str(self.address.uuid),
+            "user": self.user.user_id  
+        }
+        self.client.post(reverse('event-list'), event2_data, format='json')
+
+        response = self.client.get(reverse('event-list'), {'category': 'conference'})
+        
+        assert response.status_code == 200
+        assert len(response.data) == 1
+        assert response.data[0]["category"] == "conference"
