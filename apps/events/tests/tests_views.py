@@ -185,7 +185,12 @@ class TestEventViews:
         assert "name" in response.data
 
 
+    def test_delete_no_existent_event(self):
 
+        fake_uuid = "00000000-0000-0000-0000-000000000000"
+        response = self.client.delete(reverse('event-detail', args=[fake_uuid]))
+
+        assert response.status_code == 404
 
     
 
