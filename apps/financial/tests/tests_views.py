@@ -98,3 +98,13 @@ class TestCartPaymentsViewSet:
         
         assert len(response.data) == 1
         assert response.data[0]['status'] == 'RECEIVED'
+
+
+    
+
+    def test_retrieve_invalid_payment(self):
+        
+        invalid_hash = '12345678-1234-5678-1234-567812345678'
+
+        response = self.client.get(reverse('cartpayment-detail', args=[invalid_hash]))
+        assert response.status_code == 404
