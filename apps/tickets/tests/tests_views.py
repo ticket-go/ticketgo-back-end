@@ -7,7 +7,6 @@ from apps.address.models import Address
 from apps.financial.models import CartPayment
 from apps.users.models import CustomUser
 from datetime import date, time
-from django.core import mail
 
 @pytest.mark.django_db
 class TestTicketViews:
@@ -300,3 +299,15 @@ class TestTicketViews:
        
         self.event.refresh_from_db()
         assert self.event.tickets_available == 100  
+    
+
+    def test_create_ticket_invalid_data(self):
+       
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": ""
+        }
+
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+
+        assert response.status_code == 400  
