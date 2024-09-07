@@ -81,3 +81,4 @@ class TestCartPaymentsViewSet:
             print("Response data:", response.data)
         
         assert response.status_code == 200
+
