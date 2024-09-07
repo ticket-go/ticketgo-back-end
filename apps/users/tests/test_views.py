@@ -4,8 +4,6 @@ from django.urls import reverse
 from apps.users.models import CustomUser
 import uuid
 
-#SRP
-
 @pytest.mark.django_db
 class TestUserViews:
     username = "michael"
@@ -84,6 +82,7 @@ class TestUserViews:
     def test_logout_user_success(self):
         token = self.test_login_user_success()
 
+        # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         response = self.client.post(reverse('logout'))
 
@@ -93,6 +92,7 @@ class TestUserViews:
     def test_change_password_success(self):
         token = self.test_login_user_success()
 
+        # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         change_password_data = {
@@ -106,7 +106,6 @@ class TestUserViews:
         assert response.status_code == 200
         assert response.data["detail"] == "Senha alterada com sucesso."
 
-       
         login_data = {
             "username": self.username,
             "password": "michael2"
@@ -119,6 +118,7 @@ class TestUserViews:
     def test_change_email_success(self):
         token = self.test_login_user_success()
 
+        # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         user_id = CustomUser.objects.get(username=self.username).user_id
@@ -149,7 +149,6 @@ class TestUserViews:
         assert response.data["user"]["username"] == self.username
 
     def test_login_mobile_no_permission(self):
-       
         self.create_user(privileged=False)
 
         login_data = {
@@ -164,12 +163,12 @@ class TestUserViews:
         assert "refresh_token" not in response.data
         assert response.data["error"] == "User does not have permission to access this application"
 
-
     def test_delete_user_success(self):
         user = self.create_user(unique=True)  
         user_id = user.user_id
 
         token = self.test_login_user_success() 
+        # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         response = self.client.delete(reverse('user-detail', args=[user_id]))
@@ -181,16 +180,13 @@ class TestUserViews:
         assert user.is_active == False
 
     def test_partial_update_user_success(self):
-
         user = self.create_user(unique=True)  
-
         token = self.test_login_user_success()  
+        # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         user_id = user.user_id
-        partial_update_data = {
-            "first_name": "César"
-        }
+        partial_update_data = {"first_name": "César"}
 
         response = self.client.patch(reverse('user-detail', args=[user_id]), partial_update_data, format='json')
 
@@ -200,42 +196,31 @@ class TestUserViews:
         updated_user = CustomUser.objects.get(user_id=user_id)
         assert updated_user.first_name == "César"
 
-
     def test_list_users_success(self):
-
         self.create_user(unique=True)
-
         token = self.test_login_user_success() 
-
+        # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         response = self.client.get(reverse('user-list'), format='json')
 
         assert response.status_code == 200
         assert len(response.data) > 0  
-    
 
     def test_retrieve_user_success(self):
-
         user = self.create_user(unique=True)  
-
         token = self.test_login_user_success() 
-
+        # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         response = self.client.get(reverse('user-detail', args=[user.user_id]), format='json')
-        
-
         assert response.status_code == 200
         assert response.data["username"] == user.username
 
-
     def test_user_history_success(self):
-
         user = self.create_user(unique=True) 
-
         token = self.test_login_user_success() 
-
+        # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         response = self.client.get(reverse('user-history'), format='json')
@@ -243,9 +228,7 @@ class TestUserViews:
         assert response.status_code == 200
         assert isinstance(response.data, list)
 
-    
     def test_change_email_already_exists(self):
-
         existing_user = CustomUser.objects.create_user(
             username="email",
             email="michael@michael.com",
@@ -254,12 +237,11 @@ class TestUserViews:
         )
 
         token = self.test_login_user_success()
+        # Corrigindo o uso de HTTP_AUTHORIZATION
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         user_id = CustomUser.objects.get(username=self.username).user_id
-        change_email_data = {
-            "email": "michael@michael.com"  
-        }
+        change_email_data = {"email": "michael@michael.com"}  
 
         response = self.client.put(reverse('user-detail', args=[user_id]), change_email_data, format='json')
 

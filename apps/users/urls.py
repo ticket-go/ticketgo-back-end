@@ -1,17 +1,11 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
-
 from apps.users.views import (
     LoginViewSet,
     LoginMobileViewSet,
     CustomUserChangePasswordViewSet,
     LogoutViewSet,
     SocialLoginViewSet,
-    UserViewSet
 )
-
-router = DefaultRouter()
-router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
     path("login/", LoginViewSet.as_view(), name="login"),
@@ -24,5 +18,3 @@ urlpatterns = [
         name="change-password",
     ),
 ]
-
-urlpatterns += router.urls
