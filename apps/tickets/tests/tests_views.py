@@ -257,3 +257,17 @@ class TestTicketViews:
 
         assert response.status_code == 400
         assert response.data['error'] == 'Não é possível comprar ingressos para eventos que já ocorreram.'
+    
+
+    def test_confirmed_tickets(self):
+       
+        pending_payment = CartPayment.objects.create(value=100, status="PENDING", payment_type="CARD")
+        confirmed_payment = CartPayment.objects.create(value=100, status="RECEIVED", payment_type="CARD")
+
+        Ticket.objects.create(event=self.event, user=self.user, cart_payment=pending_payment, half_ticket=False)
+        Ticket.objects.create(event=self.event, user=self.user, cart_payment=confirmed_payment, half_ticket=False)
+
+        response = self.client.get(reverse('event-tickets-confirmed', args=[self.event.uuid]))
+
+        assert response.status_code == 200
+        assert len(response.data) == 1  
