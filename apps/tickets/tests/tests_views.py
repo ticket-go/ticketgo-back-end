@@ -87,3 +87,17 @@ class TestTicketViews:
         assert self.event.tickets_available == 99
         assert self.event.tickets_sold == 1
 
+
+    def test_list_tickets(self):
+        
+        ticket_data = {
+            "half_ticket": False,
+            "cart_payment": str(self.payment.uuid),
+        }
+        self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+        self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+
+        
+        response = self.client.get(reverse('event-tickets-list', args=[self.event.uuid]))
+        assert response.status_code == 200
+        assert len(response.data) == 2  
