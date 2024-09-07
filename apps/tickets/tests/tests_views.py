@@ -86,6 +86,27 @@ class TestTicketViews:
         self.event.refresh_from_db()
         assert self.event.tickets_available == 99
         assert self.event.tickets_sold == 1
+    
+    def test_create_half_ticket(self):
+        
+        ticket_data = {
+            "half_ticket": True,
+            "cart_payment": str(self.payment.uuid),
+        }
+
+        response = self.client.post(reverse('event-tickets-list', args=[self.event.uuid]), ticket_data, format='json')
+
+        assert response.status_code == 201
+        ticket = Ticket.objects.get(event=self.event)
+
+        assert ticket is not None
+        assert ticket.half_ticket is True
+        assert ticket.event == self.event
+        assert ticket.cart_payment == self.payment
+
+        self.event.refresh_from_db()
+        assert self.event.half_tickets_available == 49
+        assert self.event.tickets_sold == 1
 
 
     def test_list_tickets(self):
