@@ -37,3 +37,15 @@ class TestCartPaymentsViewSet:
         response = self.client.get(reverse('cartpayment-history', args=[payment.uuid]))
         assert response.status_code == 200
         assert "history_id" in response.data[0]
+    
+
+    def test_retrieve_cart_payment(self):
+        payment = CartPayment.objects.create(
+            value=100.00,
+            payment_type="CARD",
+            user=self.user
+        )
+
+        response = self.client.get(reverse('cartpayment-detail', args=[payment.uuid]))
+        assert response.status_code == 200
+        assert response.data['value'] == '100.00'
