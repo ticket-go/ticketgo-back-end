@@ -271,3 +271,14 @@ class TestTicketViews:
 
         assert response.status_code == 200
         assert len(response.data) == 1  
+    
+
+    def test_ticket_already_used(self):
+    
+        ticket = Ticket.objects.create(event=self.event, user=self.user, cart_payment=self.payment, half_ticket=False, verified=True)
+
+        verify_data = {"hash": ticket.hash}
+        response = self.client.patch(reverse('verify_ticket', args=[self.event.uuid]), verify_data, format='json')
+
+        assert response.status_code == 409
+        assert response.data['message'] == "Este ingresso já foi verificado. Por favor, verifique outro ingresso ou entre em contato com o suporte se você achar que isso é um erro."
