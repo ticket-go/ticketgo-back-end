@@ -1,6 +1,7 @@
 from pathlib import Path
 import environ, os
 import dotenv
+import sys
 
 dotenv.load_dotenv()
 
@@ -39,6 +40,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django_extensions'
 ]
 
 LOCAL_APPS = [
@@ -226,3 +228,5 @@ EMAIL_PORT = os.getenv("EMAIL_PORT")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+

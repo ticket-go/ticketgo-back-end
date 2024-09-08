@@ -47,6 +47,7 @@ class CustomUser(AbstractUser):
         verbose_name=_("Endereço"),
     )
     history = HistoricalRecords()
+    is_active = models.BooleanField(default=True, verbose_name="Ativo")
 
     class Meta:
         verbose_name = _("Usuário")
