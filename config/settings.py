@@ -2,6 +2,7 @@ from pathlib import Path
 import environ, os
 import dotenv
 import sys
+import sys
 
 dotenv.load_dotenv()
 

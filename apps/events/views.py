@@ -3,7 +3,6 @@ from apps.events.permissions import IsOwnerOrReadOnly
 from rest_framework import viewsets
 from apps.events.serializers import EventsSerializer
 from apps.events.models import Event
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 
 
@@ -23,3 +22,5 @@ class EventsViewSet(viewsets.ModelViewSet):
 
     def get_serializer_context(self):
         return {"request": self.request}
+
+    
