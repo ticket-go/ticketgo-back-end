@@ -1,6 +1,7 @@
+from rest_framework import serializers
+
 from apps.address.serializers import AddressSerializer
 from apps.address.models import Address
-from rest_framework import serializers
 from apps.users import models
 
 
@@ -82,8 +83,6 @@ class CustomUserChangePasswordSerializer(serializers.Serializer):
     def validate(self, data):
         user = self.context["request"].user
         if not user.check_password(data.get("old_password")):
-            print(f"Senha antiga fornecida: {data.get('old_password')}")
-            print(f"Senha atual do usuário: {user.password}")
             raise serializers.ValidationError(
                 {"old_password": "Senha antiga incorreta."}
             )
