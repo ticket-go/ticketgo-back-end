@@ -24,7 +24,7 @@ class CartPaymentSerializer(serializers.ModelSerializer):
     link_payment = serializers.CharField(read_only=True)
     payment_type = serializers.CharField(read_only=True)
     status = serializers.CharField(read_only=True)
-    value = serializers.DecimalField(max_digits=10, decimal_places=2)
+    value = serializers.CharField(read_only=True)
     user = serializers.UUIDField(read_only=True)
     tickets = serializers.SerializerMethodField(read_only=True)
     user_data = serializers.SerializerMethodField(read_only=True)
@@ -36,11 +36,6 @@ class CartPaymentSerializer(serializers.ModelSerializer):
     def get_tickets(self, obj):
         uuid_tickets = obj.tickets.values_list("uuid", flat=True)
         return uuid_tickets
-
-    def validate_value(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("O valor deve ser positivo.")
-        return value
 
     def validate_payment_type(self, value):
         valid_types = ["CARD", "CASH", "PIX"]
