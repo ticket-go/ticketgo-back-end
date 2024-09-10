@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404
 from apps.events.models import Event
 from apps.tickets.models import Ticket
 from apps.tickets.serializers import TicketSerializer, VerifyTicketSerializer
+from datetime import date
 
 
 class TicketEmailService:
@@ -151,42 +152,41 @@ class TicketsViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         event = self.get_event()
 
+        if event.date < date.today():
+            message = "Não é possível comprar ingressos para eventos que já ocorreram."
+            return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         half_ticket = serializer.validated_data.get("half_ticket", False)
         is_half_ticket = True if half_ticket else False
 
-        # Check if there are available tickets for the event
-        if event.tickets_available == 0:
+        print(f"Tickets available: {event.tickets_available}")
+        if not is_half_ticket and event.tickets_available <= 0:
             message = "Não há mais ingressos disponíveis para este evento."
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
-        if is_half_ticket == True and event.half_tickets_available == 0:
+        if is_half_ticket and event.half_tickets_available <= 0:
             message = "Não há mais ingressos do tipo meia-entrada disponíveis para este evento."
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if there are half tickets for the event
-        if is_half_ticket == True and event.half_ticket_quantity == 0:
-            message = "Não há meia entrada disponível para este evento."
+        
+        if is_half_ticket and event.half_ticket_quantity <= 0:
+            message = "Não há meia-entrada disponível para este evento."
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Update the ticket count for the event
-        if is_half_ticket == True and event.half_tickets_available:
+       
+        if is_half_ticket:
             event.half_tickets_available -= 1
         else:
             event.tickets_available -= 1
         event.tickets_sold += 1
         event.save()
 
-        is_half_ticket = serializer.validated_data.get("half_ticket", False)
-
         payment = self.get_payment()
-        # Update the payment value
-        half_ticket = serializer.validated_data.get("half_ticket", False)
-        ticket_value = (
-            event.half_ticket_value if half_ticket == True else event.ticket_value
-        )
+
+        ticket_value = event.half_ticket_value if is_half_ticket else event.ticket_value
         payment.value += ticket_value
         payment.save()
 
@@ -196,9 +196,7 @@ class TicketsViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -207,7 +205,7 @@ class TicketsViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         event = instance.event
 
-        # Update the ticket count for the event
+       
         if instance.half_ticket:
             event.half_tickets_available += 1
         else:
@@ -215,8 +213,8 @@ class TicketsViewSet(viewsets.ModelViewSet):
         event.tickets_sold -= 1
         event.save()
 
-        # Update the payment value
-        payment = instance.payment
+      
+        payment = instance.cart_payment
         ticket_value = (
             instance.event.half_ticket_value
             if instance.half_ticket
