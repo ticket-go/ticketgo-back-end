@@ -1,9 +1,10 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
+
 from apps.events.models import Event
 from apps.address.models import Address
 from apps.address.serializers import AddressSerializer
 from apps.users.serializers import CustomUserSerializer
-from drf_spectacular.utils import extend_schema_field
 
 
 class EventsSerializer(serializers.ModelSerializer):
@@ -62,12 +63,16 @@ class EventsSerializer(serializers.ModelSerializer):
 
     def validate_ticket_quantity(self, value):
         if value < 0:
-            raise serializers.ValidationError("A quantidade de ingressos não pode ser negativa.")
+            raise serializers.ValidationError(
+                "A quantidade de ingressos não pode ser negativa."
+            )
         return value
 
     def validate_half_ticket_quantity(self, value):
         if value < 0:
-            raise serializers.ValidationError("A quantidade de meia-entrada não pode ser negativa.")
+            raise serializers.ValidationError(
+                "A quantidade de meia-entrada não pode ser negativa."
+            )
         return value
 
     def __init__(self, *args, **kwargs):

@@ -1,7 +1,8 @@
-from apps.users.serializers import CustomUserSerializer
 from rest_framework import serializers
-from apps.financial.models import CartPayment
 from drf_spectacular.utils import extend_schema_field
+
+from apps.users.serializers import CustomUserSerializer
+from apps.financial.models import CartPayment
 
 
 class CartPaymentSerializer(serializers.ModelSerializer):
@@ -36,12 +37,6 @@ class CartPaymentSerializer(serializers.ModelSerializer):
     def get_tickets(self, obj):
         uuid_tickets = obj.tickets.values_list("uuid", flat=True)
         return uuid_tickets
-
-    def validate_payment_type(self, value):
-        valid_types = ["CARD", "CASH", "PIX"]
-        if value not in valid_types:
-            raise serializers.ValidationError("Tipo de pagamento inválido.")
-        return value
 
     def create(self, validated_data):
         user = self.context["request"].user

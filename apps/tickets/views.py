@@ -162,7 +162,6 @@ class TicketsViewSet(viewsets.ModelViewSet):
         half_ticket = serializer.validated_data.get("half_ticket", False)
         is_half_ticket = True if half_ticket else False
 
-        print(f"Tickets available: {event.tickets_available}")
         if not is_half_ticket and event.tickets_available <= 0:
             message = "Não há mais ingressos disponíveis para este evento."
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
@@ -171,12 +170,10 @@ class TicketsViewSet(viewsets.ModelViewSet):
             message = "Não há mais ingressos do tipo meia-entrada disponíveis para este evento."
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
-        
         if is_half_ticket and event.half_ticket_quantity <= 0:
             message = "Não há meia-entrada disponível para este evento."
             return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
-       
         if is_half_ticket:
             event.half_tickets_available -= 1
         else:
@@ -196,7 +193,9 @@ class TicketsViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -205,7 +204,6 @@ class TicketsViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         event = instance.event
 
-       
         if instance.half_ticket:
             event.half_tickets_available += 1
         else:
@@ -213,7 +211,6 @@ class TicketsViewSet(viewsets.ModelViewSet):
         event.tickets_sold -= 1
         event.save()
 
-      
         payment = instance.cart_payment
         ticket_value = (
             instance.event.half_ticket_value
