@@ -37,11 +37,6 @@ class CartPaymentSerializer(serializers.ModelSerializer):
         uuid_tickets = obj.tickets.values_list("uuid", flat=True)
         return uuid_tickets
 
-    def validate_value(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("O valor deve ser positivo.")
-        return value
-
     def validate_payment_type(self, value):
         valid_types = ["CARD", "CASH", "PIX"]
         if value not in valid_types:
